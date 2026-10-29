@@ -1,0 +1,14 @@
+{
+  "name": "brass-wallet",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Brass Wallet: money, loans, income and turn order for a Brass: Birmingham table. No board.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "node scripts/test-gate.mjs",
+    "e2e": "node test/e2e/multi-phone.e2e.mjs",
+    "build": "node scripts/build-embedded.mjs"
+  },
+  "devDependencies": { "esbuild": "^0.27.3", "wrangler": "^4" }
+}
