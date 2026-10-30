@@ -1,0 +1,27 @@
+{
+ "scan": [
+  "public",
+  "src"
+ ],
+ "common": "U+A0,U+2013-2014,U+2018-2019,U+201C-201D,U+2022,U+2026",
+ "features": [
+  "ccmp",
+  "locl",
+  "mark",
+  "mkmk",
+  "kern",
+  "liga",
+  "clig",
+  "calt",
+  "rlig",
+  "rvrn",
+  "tnum"
+ ],
+ "fonts": [
+  {
+   "src": "scripts/fonts/src/bitter-700.woff2",
+   "out": "bitter-700",
+   "split": true
+  }
+ ]
+}
