@@ -52,8 +52,20 @@ export function incomePlan(t) {
 function canActOn(t, actor, seat) { return !!seat && ((actor.host && seat.where === 'local') || actor.seatId === seat.id); }
 const IN_PLAY = ['turns', 'endround'];
 
-// eslint-disable-next-line complexity
+// A message id (`mid`) makes a change happen once: the same message again (a resend, a double-sent tap) is answered ok and
+// changes nothing. The table keeps the last MID_KEEP ids it applied.
+export const MID_KEEP = 64;
+const cleanMid = (m) => (typeof m === 'string' && /^[A-Za-z0-9_-]{4,40}$/.test(m) ? m : null);
 export function reduce(t, actor, msg, rng = Math.random, now = Date.now()) {
+  const mid = cleanMid(msg?.mid);
+  if (mid && t.mids?.includes(mid)) return ok({ dup: true });
+  const res = reduceOnce(t, actor, msg, rng, now);
+  if (mid && res.ok) { (t.mids ||= []).push(mid); if (t.mids.length > MID_KEEP) t.mids.splice(0, t.mids.length - MID_KEEP); }
+  return res;
+}
+
+// eslint-disable-next-line complexity
+function reduceOnce(t, actor, msg, rng, now) {
   const host = !!actor.host;
   const hostOnly = () => (host ? null : err('Only the host can do that.'));
   const seat = msg.seat ? seatById(t, msg.seat) : null;

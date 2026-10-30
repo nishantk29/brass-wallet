@@ -35,7 +35,18 @@ function flash(msg) { A.flash = msg; render(); clearTimeout(flash.t); flash.t = 
 // ---- transport ---------------------------------------------------------------------------------------------------------
 function saveLocal() { store.set(K.local, JSON.stringify(T)); }
 function localView() { A.view = viewFor(T, { host: true }); }
+// Each change carries a message id, so the table applies it once. The same change sent again within SAME_TAP_MS
+// (a double tap, a double submit) reuses the id and the table ignores the copy.
+const SAME_TAP_MS = 700;
+const newMid = () => Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(36).padStart(2, '0')).join('');
+function stampMid(msg) {
+  const key = JSON.stringify(msg); const now = Date.now(); const last = stampMid.last;
+  const mid = last && last.key === key && now - last.at < SAME_TAP_MS ? last.mid : newMid();
+  stampMid.last = { key, at: now, mid };
+  return { ...msg, mid };
+}
 function send(msg) {
+  msg = stampMid(msg);
   if (A.mode === 'local') {
     const r = reduce(T, { host: true }, msg, Math.random, Date.now());
     if (r.error) { flash(r.error); return r; }
@@ -395,7 +406,7 @@ function doJoin(seat) {
   if (!seat && !name) { A.err = 'Type your name first.'; return render(); }
   if (!ws || ws.readyState !== 1) { A.err = 'Not connected yet. Try again in a second.'; return render(); }
   if (name) store.set(K.name, name);
-  ws.send(JSON.stringify({ type: 'hello', join: name || 'Player', seat }));
+  ws.send(JSON.stringify(stampMid({ type: 'hello', join: name || 'Player', seat })));
 }
 document.addEventListener('submit', (e) => {
   const f = e.target.closest('[data-form]'); if (!f) return;

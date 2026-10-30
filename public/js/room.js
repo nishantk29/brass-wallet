@@ -18,8 +18,9 @@ export function hello(room, msg, rng, now) {
     return { att: { who: 'seat', seatId: s.id, token: s.token } };
   }
   if (msg.join) {
-    const res = reduce(room, { host: false }, { type: 'join', name: msg.join, seat: msg.seat }, rng, now);
+    const res = reduce(room, { host: false }, { type: 'join', name: msg.join, seat: msg.seat, mid: msg.mid }, rng, now);
     if (res.error) return { error: res.error };
+    if (res.data.dup) return { dup: true }; // the same join tapped twice: the first one already seated this socket
     return { att: { who: 'seat', seatId: res.data.seatId, token: res.data.token }, reply: { type: 'joined', ...res.data } };
   }
   return { lobby: { type: 'lobby', phase: room.phase, open: room.seats.filter((s) => s.open).map((s) => ({ id: s.id, name: s.name })), count: room.seats.length, started: room.phase !== 'setup' } };
