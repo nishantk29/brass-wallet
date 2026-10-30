@@ -55,7 +55,7 @@
    "styles.css|.acts|padding|0 4px": 1,
    "styles.css|.sc th|padding|8px 6px": 1,
    "styles.css|.sc td|padding|6px": 1,
-   "styles.css|.banner|padding|8px var(--s4)": 1,
+   "styles.css|.banner|padding|8px calc(var(--s4) + var(--safe-r)) 8px calc(var(--s4) + var(--safe-l))": 1,
    "styles.css|.flash|padding|12px var(--s4)": 1,
    "styles.css|.steps|gap|6px": 1
   },
