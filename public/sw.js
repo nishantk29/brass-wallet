@@ -3,7 +3,7 @@
 // - Navigations: network-first, falling back to the cached app shell.
 // - /api/* and /ws/* never touch the cache.
 // VERSION is a content hash of every precached file, so it changes whenever a file does.
-const VERSION = 'f5af8bdff0';
+const VERSION = 'ea9aa74e9d';
 const PREFIX = 'brass-wallet-';
 const CACHE = PREFIX + VERSION;
 
@@ -11,6 +11,7 @@ const SHELL = '/';
 const PRECACHE = [
   '/',
   '/404.html',
+  '/family.css',
   '/fonts/LICENSE-bitter.txt',
   '/fonts/LICENSE-rubik.txt',
   '/fonts/bitter-700-core.woff2',
@@ -31,7 +32,7 @@ const PRECACHE = [
   '/js/wake.js',
   '/manifest.webmanifest',
   '/pwa-install.js',
-  '/styles.css',
+  '/styles.css'
 ];
 
 const isLive = (url) => url.pathname.startsWith('/api/') || url.pathname.startsWith('/ws/');

@@ -1,0 +1,135 @@
+/* ======================================================================================
+   Game Night family tokens: shared by the hub, Mafia Night, Quest Night, The Gilded Chamber, The Odd Card and Brass Wallet.
+   Link this file FIRST, before the site's own CSS. Then set the four per-site variables on :root:
+   --f-accent, --f-display-font, --f-bg, --f-ink. Everything else here is identical on every site.
+   Source of truth: /workspace/code-team/shared/family/family.css (copy it, do not fork it).
+   ====================================================================================== */
+:root{
+  /* per-site hooks (override in the site's own CSS) */
+  --f-accent:#E0AE52;            /* the one primary action colour */
+  --f-display-font:var(--f-ui-font);  /* each site sets its own display face */
+  --f-bg:#0B0B0D;
+  --f-ink:#F1E6D2;
+  --f-on-accent:#1B1410;
+  --f-danger:#F26B66;
+  --f-line:rgba(255,255,255,.36);
+  --f-ui-font:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+
+  /* spacing, 4px base */
+  --f-s1:4px; --f-s2:8px; --f-s3:12px; --f-s4:16px; --f-s5:24px; --f-s6:32px; --f-s7:48px; --f-s8:72px;
+
+  /* type scale */
+  --f-fs-xs:.8125rem;
+  --f-fs-sm:clamp(.9375rem,.9rem + .15vw,1rem);
+  --f-fs-md:clamp(1.0625rem,1rem + .25vw,1.125rem);
+  --f-fs-lg:clamp(1.25rem,1.12rem + .5vw,1.5rem);
+  --f-fs-xl:clamp(1.625rem,1.35rem + 1.1vw,2.25rem);
+  --f-fs-2xl:clamp(2.25rem,1.7rem + 2.4vw,3.75rem);
+  --f-fs-3xl:clamp(3.25rem,2rem + 6vw,7.5rem);
+
+  /* type roles (Nishant 2026-10-30 8:43 AM ET: FLUID, one scale, the same role names on every site).
+     Ramp from Scout's spec (/workspace/scout/design/SPACING.md section 1, Apple HIG Dynamic Type): Apple Medium at 320 wide,
+     Large at 390, capped at xLarge, every role growing 1.429vw (1px per 70px). rem + vw only.
+     At 390: title 28, heading 20, body 17, secondary 15, caption 13, tab 11, number 40 (capped at 40), display 44. */
+  --f-fs-display:clamp(2.5rem,1.357rem + 5.714vw,3.5rem);      /* game name, hero wordmark */
+  --f-fs-title:clamp(1.6875rem,1.4017rem + 1.429vw,1.875rem);  /* screen or sheet title */
+  --f-fs-heading:clamp(1.1875rem,.9017rem + 1.429vw,1.375rem); /* section heading */
+  --f-fs-body:clamp(1rem,.7142rem + 1.429vw,1.1875rem);         /* UI copy, rows, buttons, inputs (never under 16) */
+  --f-fs-secondary:clamp(.875rem,.5892rem + 1.429vw,1.0625rem); /* subtitles, meta, notes */
+  --f-fs-caption:clamp(.75rem,.4642rem + 1.429vw,.9375rem);     /* fine print */
+  --f-fs-tab:clamp(.6875rem,.3392rem + 1.429vw,.8125rem);       /* tab bar labels only; floor 11 */
+  --f-fs-number:clamp(2.4375rem,2.1517rem + 1.429vw,2.5rem);    /* the one big number; max 40px (the Brass balance) */
+  /* leading: Apple adds a constant to the size (calc(1em + N rem)), so big type gets tighter on its own. Set these on the
+     element that has the font-size (lengths inherit as absolutes). :root keeps a unitless 1.3 fallback below. */
+  --f-lh-display:calc(1em + .375rem);
+  --f-lh-caps:calc(1em + .125rem);      /* all-caps display (Mafia Art Deco heads) */
+  --f-lh-title:calc(1em + .375rem);     /* 28/34 */
+  --f-lh-heading:calc(1em + .3125rem);  /* 20/25 */
+  --f-lh-text:calc(1em + .3125rem);     /* body 17/22, secondary 15/20, caption 13/18 */
+  --f-lh-body:var(--f-lh-text); --f-lh-secondary:var(--f-lh-text); --f-lh-caption:var(--f-lh-text);
+  --f-lh-tab:calc(1em + .125rem);       /* 11/13, one line */
+  --f-lh-number:calc(1em + .25rem);     /* 40/44 */
+  --f-lh-read:1.5;                      /* rules and FAQ paragraphs of 3+ lines (HIG, MDN) */
+  --f-lh-btn:1.2;                       /* one-line button labels; height comes from min-height (Scout proposal) */
+  --f-ls-display:-.01em; --f-ls-small:.01em; --f-ls-caps:.04em;   /* tracking (Scout proposal, for Nishant's OK) */
+  --f-t-title:700 var(--f-fs-title)/var(--f-lh-title) var(--f-display-font);
+  --f-t-heading:600 var(--f-fs-heading)/var(--f-lh-heading) var(--f-ui-font);
+  --f-t-body:400 var(--f-fs-body)/var(--f-lh-text) var(--f-ui-font);
+  --f-t-secondary:400 var(--f-fs-secondary)/var(--f-lh-text) var(--f-ui-font);
+  --f-t-caption:400 var(--f-fs-caption)/var(--f-lh-text) var(--f-ui-font);
+  --f-t-tab:600 var(--f-fs-tab)/var(--f-lh-tab) var(--f-ui-font);
+  --f-t-number:700 var(--f-fs-number)/var(--f-lh-number) var(--f-ui-font);
+  /* the names Fennel reserved for the spec (aliases, so either vocabulary passes the gate) */
+  --lh-title:var(--f-lh-title); --lh-heading:var(--f-lh-heading); --lh-body:var(--f-lh-text); --lh-secondary:var(--f-lh-text); --lh-caption:var(--f-lh-text); --lh-read:var(--f-lh-read);
+  --space-1:var(--f-s1); --space-2:var(--f-s2); --space-3:var(--f-s3); --space-4:var(--f-s4); --space-5:var(--f-s5); --space-6:var(--f-s6); --space-7:var(--f-s7); --space-8:var(--f-s8);
+  --margin-side:var(--f-margin); --gap-section:var(--f-s6); --gap-section-game:var(--f-s5); --gap-inner:var(--f-s2); --gap-head:var(--f-s3);
+
+  /* radii */
+  /* radii (Nishant 2026-10-29): every border-radius is one of these. sm/md/lg are kept as aliases. */
+  --f-r-inset:4px; --f-r-field:12px; --f-r-card:20px; --f-r-sheet:28px; --f-r-pill:999px; --f-r-round:50%; --f-r-face:6% / 4.3%;
+  --f-r-sm:var(--f-r-field); --f-r-md:var(--f-r-field); --f-r-lg:var(--f-r-card);
+
+  /* sizes */
+  --f-btn-h:52px; --f-btn-h-sm:44px; --f-tap:44px; --f-header-h:56px;
+
+  /* component sizes and icons (glass kit): one icon set, one size per context */
+  --f-row-h:52px; --f-row-2:66px; --f-chip-h:36px; --f-tabbar-h:62px; --f-icon-btn:44px; --f-btn-gap:var(--f-s3);
+  --f-ic-row:20px; --f-ic-btn:20px; --f-ic-bar:22px; --f-ic-tab:24px; --f-ic-lead:28px;
+
+  /* placement: the same slot on every game. Side margin steps 16 / 20 (400+) / 24 (600+), equal on both sides,
+     ADDED to the safe area (UIKit measures margins from the safe area). Scout SPACING.md section 3. */
+  --f-margin:16px;
+  --f-pad-l:calc(var(--f-margin) + env(safe-area-inset-left,0px));
+  --f-pad-r:calc(var(--f-margin) + env(safe-area-inset-right,0px));
+  --f-content-max:680px;
+  --f-safe-b:max(var(--f-s3),env(safe-area-inset-bottom));
+  --f-dock-h:calc(var(--f-btn-h) + var(--f-s4) * 2);
+  --f-chrome-b:calc(var(--f-safe-b) + var(--f-s4));
+  --f-chrome-b-tab:calc(var(--f-safe-b) + var(--f-tabbar-h) + var(--f-s4));
+  --f-chrome-b-dock:calc(var(--f-safe-b) + var(--f-dock-h));
+  --f-chrome-b-both:calc(var(--f-safe-b) + var(--f-tabbar-h) + var(--f-dock-h));
+
+  /* motion (Nishant, 2026-10-29): presses are snappy and nothing runs over 400ms.
+     Durations are written as seen (no scale knob); reduced motion turns movement off.
+     Press feedback lands in 100-150ms. */
+  --f-ease:cubic-bezier(.2,.8,.2,1);
+  --f-press:120ms;                       /* press-in: 100-150ms, never scaled */
+  --f-release:90ms;                      /* release: about 0.7x the press */
+  --f-press-scale:.97;                   /* buttons and cards; list rows highlight instead */
+  --f-press-row:rgba(255,255,255,.08);   /* list-row press highlight, layered over the row's own background */
+  --f-dur-fast:160ms;
+  --f-dur-med:280ms;
+  --f-dur-slow:400ms; /* the ceiling: nothing runs longer */
+}
+@media (min-width:400px){:root{--f-margin:20px}}
+@media (min-width:600px){:root{--f-margin:24px}}
+
+/* ---- buttons: exactly three looks. One primary per screen. Labels never wrap. ---- */
+.f-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--f-s2);box-sizing:border-box;
+  min-height:var(--f-btn-h-sm);padding:0 var(--f-s5);border:2px solid var(--f-line);border-radius:var(--f-r-pill);
+  background:transparent;color:var(--f-ink);font:600 var(--f-fs-md)/1.2 var(--f-ui-font);letter-spacing:0;text-transform:none;
+  text-align:center;text-decoration:none;white-space:nowrap;cursor:pointer;
+  transition:transform var(--f-release) var(--f-ease)}
+.f-btn:active{transform:scale(var(--f-press-scale))}
+.f-btn--primary{min-height:var(--f-btn-h);background:var(--f-accent);border-color:var(--f-accent);color:var(--f-on-accent)}
+.f-btn--secondary{background:transparent;border-color:var(--f-line);color:var(--f-ink)}
+.f-btn--danger{background:transparent;border-color:var(--f-danger);color:var(--f-danger)}
+.f-btn[disabled],.f-btn[aria-disabled="true"]{background:transparent;border:2px solid var(--f-line);color:var(--f-ink);opacity:.5;cursor:not-allowed;transform:none}
+.f-btn:focus-visible{outline:3px solid var(--f-accent);outline-offset:3px}
+.f-btn-row{display:flex;flex-wrap:wrap;gap:var(--f-s2);container-type:inline-size}
+.f-btn-row > .f-btn{flex:1 1 auto}
+@container (max-width:30rem){.f-btn-row > .f-btn{flex-basis:100%}}
+@media (prefers-reduced-motion:reduce){.f-btn{transition:none}.f-btn:active{transform:none}}
+@media (prefers-reduced-motion:no-preference){.f-btn:active{transition-duration:var(--f-press)}}
+
+/* ---- header ---- */
+.f-header{display:flex;align-items:center;gap:var(--f-s3);min-height:var(--f-header-h);padding:0 max(var(--f-s4),env(safe-area-inset-left));
+  background:var(--f-bg);color:var(--f-ink);font-family:var(--f-ui-font)}
+.f-header a,.f-header button{min-height:var(--f-tap);min-width:var(--f-tap);display:inline-flex;align-items:center;justify-content:center;color:inherit;text-decoration:none}
+.f-header-title{font-family:var(--f-display-font);font-size:var(--f-fs-lg);margin:0}
+
+/* ---- footer: links always have a 44px tap area ---- */
+.f-footer{display:grid;gap:var(--f-s3);justify-items:start;padding:var(--f-s5) max(var(--f-s4),env(safe-area-inset-left)) var(--f-s6);
+  border-top:1px solid rgba(255,255,255,.1);background:var(--f-bg);color:var(--f-ink);font:400 var(--f-fs-sm)/1.4 var(--f-ui-font)}
+.f-footer a{display:inline-flex;align-items:center;min-height:var(--f-tap);color:inherit;text-underline-offset:3px}
+.f-footer ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:0 var(--f-s5)}
