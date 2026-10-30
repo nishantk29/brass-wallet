@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { newTable, reduce, seatById, MID_KEEP } from '../public/js/table.js';
+import { newTable, reduce, seatById, MID_KEEP, SAME_TAP_MS, midStamper } from '../public/js/table.js';
 import { hello } from '../public/js/room.js';
 
 const rng = () => 0.5;
@@ -84,4 +84,18 @@ test('a join sent twice seats the phone once', () => {
   assert.equal(t.seats.length, 2);
   assert.ok(hello(t, { ...msg, join: 'Eve', mid: 'join-0002' }, rng, 1).reply, 'a new join still works');
   assert.equal(t.seats.length, 3);
+});
+
+test('the phone: the same tap 0.39 s later counts once, 0.41 s later counts twice', () => {
+  assert.equal(SAME_TAP_MS, 400);
+  let clock = 0; let n = 0;
+  const stamp = midStamper({ now: () => clock, newMid: () => `mid-${++n}x` });
+  const { t, ann } = table(); const m0 = money(t, ann);
+  const tap = (at) => { clock = at; return reduce(t, { seatId: ann }, stamp({ type: 'spend', seat: ann, amount: 3, kind: 'canal' }), rng, at); };
+  tap(1000); tap(1390);
+  assert.equal(money(t, ann), m0 - 3, 'taps 0.39 s apart are one spend');
+  tap(5000); tap(5410);
+  assert.equal(money(t, ann), m0 - 9, 'taps 0.41 s apart are two spends');
+  clock = 5500; const other = stamp({ type: 'spend', seat: ann, amount: 5, kind: 'canal' });
+  assert.notEqual(other.mid, `mid-${n - 1}x`, 'a different chip always gets a new id');
 });

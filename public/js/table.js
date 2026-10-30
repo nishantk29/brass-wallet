@@ -56,6 +56,18 @@ const IN_PLAY = ['turns', 'endround'];
 // changes nothing. The table keeps the last MID_KEEP ids it applied.
 export const MID_KEEP = 64;
 const cleanMid = (m) => (typeof m === 'string' && /^[A-Za-z0-9_-]{4,40}$/.test(m) ? m : null);
+// The phone side: gives each change a new id, except the same change sent again within SAME_TAP_MS (a double tap or
+// double submit), which reuses the last id so the table drops the copy. Repeats over the network always reuse the id.
+export const SAME_TAP_MS = 400;
+export function midStamper({ windowMs = SAME_TAP_MS, now = () => Date.now(), newMid } = {}) {
+  let last = null;
+  return (msg) => {
+    const key = JSON.stringify(msg); const at = now();
+    const mid = last && last.key === key && at - last.at < windowMs ? last.mid : newMid();
+    last = { key, at, mid };
+    return { ...msg, mid };
+  };
+}
 export function reduce(t, actor, msg, rng = Math.random, now = Date.now()) {
   const mid = cleanMid(msg?.mid);
   if (mid && t.mids?.includes(mid)) return ok({ dup: true });

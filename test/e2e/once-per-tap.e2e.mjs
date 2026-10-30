@@ -46,6 +46,18 @@ try {
   L.check('a second tap after a pause charges again', await balIs(cal, '£11'), await bal(cal));
   await host.page.locator('.seat', { hasText: 'Cal' }).click();
   L.check('host sees the same balance for Cal', await balIs(host, '£11'), await bal(host));
+  // Two taps on the same chip a set time apart, timed inside the page (busy-wait, so the gap is at least that long).
+  const tapTwice = (p, gapMs) => p.page.evaluate((gap) => {
+    const chip = () => [...document.querySelectorAll('[data-act="spend"][data-kind="canal"]')][0];
+    chip().click(); const t0 = performance.now(); while (performance.now() - t0 < gap) { /* wait */ } chip().click();
+    return performance.now() - t0;
+  }, gapMs);
+  await sleep(600); // the last Canal link tap must be outside the window
+  const g1 = await tapTwice(cal, 390); await sleep(800);
+  L.check('two taps 0.39 s apart charge once', await balIs(cal, '£8'), `${await bal(cal)}, gap ${Math.round(g1)} ms`);
+  await sleep(600);
+  const g2 = await tapTwice(cal, 410); await sleep(800);
+  L.check('two taps 0.41 s apart charge twice', await balIs(cal, '£2'), `${await bal(cal)}, gap ${Math.round(g2)} ms`);
 
   await click(dee, 'Canal link'); await sleep(800);
   L.check('a spend that reaches the table twice is charged once', await balIs(dee, '£14'), await bal(dee));
