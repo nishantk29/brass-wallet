@@ -3,7 +3,7 @@
 // - Navigations: network-first, falling back to the cached app shell.
 // - /api/* and /ws/* never touch the cache.
 // VERSION is a content hash of every precached file, so it changes whenever a file does.
-const VERSION = '94707825da';
+const VERSION = 'e84d849ed7';
 const PREFIX = 'brass-wallet-';
 const CACHE = PREFIX + VERSION;
 
@@ -13,7 +13,8 @@ const PRECACHE = [
   '/404.html',
   '/fonts/LICENSE-bitter.txt',
   '/fonts/LICENSE-rubik.txt',
-  '/fonts/bitter-700.woff2',
+  '/fonts/bitter-700-core.woff2',
+  '/fonts/bitter-700-ext.woff2',
   '/fonts/rubik-var.woff2',
   '/icons/apple-touch-icon.png',
   '/icons/favicon-32.png',
