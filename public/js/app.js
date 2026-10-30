@@ -141,7 +141,7 @@ function startScreen() {
   const saved = store.get(K.local);
   return `<main style="padding-top:var(--s7);gap:var(--s6)">
  <div><h1 class="disp" style="font-size:3.4rem;line-height:.95">Brass<br>Wallet</h1><p class="tint" style="margin-top:var(--s3)">Money, loans, income and turn order for your Brass: Birmingham table. The board stays on the table.</p></div>
- <div style="display:flex;gap:var(--s3)"><span class="coin" style="width:72px;height:72px"><span>£${R.START_MONEY}</span></span><p class="sm tint" style="flex:1;align-self:center">Each player starts with £${R.START_MONEY} and income £0.</p></div>
+ <div style="display:flex;gap:var(--s3)"><span class="coin cu" style="width:72px;height:72px"><span>£${R.START_MONEY}</span></span><p class="sm tint" style="flex:1;align-self:center">Each player starts with £${R.START_MONEY} and income £0.</p></div>
  <section style="display:grid;gap:var(--s2)"><p class="grp">Join a table</p><form class="field${A.err && A.page === 'start' ? ' err' : ''}" data-form="join"><input id="code" name="code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" placeholder="Room code" aria-label="Room code" value="${esc(A.draft.code || '')}" data-in="code"><button class="add" type="submit"${A.busy ? ' disabled' : ''}>Join</button></form>
  ${A.err ? `<p class="why" role="alert" style="text-align:left;color:oklch(80% 0.1 50)">${esc(A.err)}</p>` : ''}</section>
  <p class="sm tint">No internet? <button class="link" data-act="local">Play on this phone only</button>${saved ? ` <button class="link" data-act="resume">Resume the saved table</button>` : ''}</p>
@@ -200,7 +200,7 @@ function coinsHtml(v, s) {
   const links = v.era === 'canal'
     ? c('cu', '£' + R.CANAL_COST, 'Canal link', 'spend', `data-amount="${R.CANAL_COST}" data-kind="canal"`)
     : c('cu', '£' + R.RAIL_COST, 'Rail link', 'spend', `data-amount="${R.RAIL_COST}" data-kind="rail"`) + c('cu', '£' + R.DOUBLE_RAIL_COST, 'Two rail links', 'spend', `data-amount="${R.DOUBLE_RAIL_COST}" data-kind="rail2"`);
-  return `<div class="coins">${links}${c('cu', '£…', 'Other cost', 'other')}${c('', '+' + R.LOAN_AMOUNT, 'Take a loan', 'loan')}${c('', '+' + R.MERCHANT_BONUS_MONEY, 'Merchant', 'merchant')}</div>
+  return `<div class="coins">${links}${c('cu', '£…', 'Other cost', 'other')}${c('cu', '+' + R.LOAN_AMOUNT, 'Take a loan', 'loan')}${c('cu', '+' + R.MERCHANT_BONUS_MONEY, 'Merchant', 'merchant')}</div>
 <div style="display:flex;gap:var(--s5)"><button class="link" data-act="incomeSheet" data-seat="${s.id}">${icon('up', 'sm')}Income spaces</button><button class="link" data-act="vpSheet" data-seat="${s.id}">${icon('star', 'sm')}Add VP</button></div>`;
 }
 function logRows(v, filterId, limit) {
@@ -271,7 +271,7 @@ function overScreen(v) {
   const ranked = v.final.map(seatOf); const win = ranked[0];
   const tie = ranked.length > 1 && ranked[1].vp === win.vp;
   return `${barHtml('Game over', `${v.seats.length} players`)}
-<main style="padding-top:var(--s5);gap:var(--s5)"><div><p class="sm tint">${tie ? 'Tie on VP, so income decides' : 'Winner'}</p><h2 class="disp win">${esc(win.name)} wins</h2></div>
+<main style="padding-top:var(--s5);gap:var(--s5)"><div class="win-card"><p class="sm">${tie ? 'Tie on VP, so income decides' : 'Winner'} · ${win.vp} VP</p><h2 class="disp win">${esc(win.name)} wins</h2></div>
  <ol class="rows">${ranked.map((s, i) => `<li><span class="disp num" style="font-size:var(--xl);width:28px">${i + 1}</span>${tok(s)}<span class="t"><b>${esc(s.name)}</b><span>Income ${money(s.level)}, money ${money(s.money)}</span></span><span class="n">${s.vp} VP</span></li>`).join('')}</ol>
  <section class="ledger" style="padding:var(--s2) 0"><p class="lg-row" style="font-weight:600">Table log</p>${logRows(v, null, 6)}</section>
 </main>${dock(me().host ? `<button class="btn pri" data-act="again">Play again with the same seats</button>` : `<p class="why">The host can start a new game.</p>`)}`;

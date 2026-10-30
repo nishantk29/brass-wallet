@@ -160,3 +160,8 @@ main{flex:1;padding:0 var(--pad-r) var(--s5) var(--pad-l);display:flex;flex-dire
 .ledger .link{color:oklch(38% 0.09 60)}
 .lg-row .link{min-height:44px}
 p{text-wrap:pretty}
+
+/* All-copper coins and the copper winner card (combo E, Brass Wallet mockups): every coin is the copper art, and the winner
+   is one copper pop card at the top of Game over. */
+.win-card{display:grid;gap:var(--f-s1);padding:var(--f-s4);border-radius:var(--f-r-card);background:var(--copper);color:var(--on)}
+.win-card .sm{font-weight:600}
