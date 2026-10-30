@@ -3,6 +3,11 @@
 @font-face{font-family:"Bitter";src:url(/fonts/bitter-700-core.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+20-7E,U+A0,U+A3,U+B7,U+2013-2014,U+2018-2019,U+201C-201D,U+2022,U+2026,U+2212}@font-face{font-family:"Bitter";src:url(/fonts/bitter-700-ext.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0,U+D,U+A1-A2,U+A4-AC,U+AE-B6,U+B8-FF,U+102,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+300-301,U+303-304,U+308-309,U+323,U+2009,U+200B,U+201A,U+201E,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2215}
 /* Proposal mockups v2, redrawn against /workspace/forge/DESIGN.md. Not shipped. */
 :root{
+  /* landscape safe areas (viewport-fit=cover), SPACING.md 3: every page edge pads by the part of the inset that the
+     centred 520px column (from 700 wide) doesn't already clear */
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px); --centre-gap:0px;
+  --inset-l:max(0px,calc(var(--safe-l) - var(--centre-gap))); --inset-r:max(0px,calc(var(--safe-r) - var(--centre-gap)));
+  --pad-l:calc(var(--s4) + var(--inset-l)); --pad-r:calc(var(--s4) + var(--inset-r));
  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;
  --xs:.8125rem;--sm:.9375rem;--md:1.0625rem;--lg:1.25rem;--xl:1.625rem;--x2:2.25rem;--x3:3.4rem;
  --ease:cubic-bezier(.2,.8,.2,1);
@@ -26,16 +31,16 @@ h1,h2,h3,th,b,strong{font-weight:600} li{list-style:none}
 .xs{font-size:var(--xs);font-weight:400;line-height:1.35} .sm{font-size:var(--sm)} .lg{font-size:var(--lg);font-weight:600;line-height:1.25}
 .num{font-variant-numeric:tabular-nums}
 /* masthead: left aligned, no box */
-.top{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4) 0;min-height:52px}
+.top{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--pad-r) 0 var(--pad-l);min-height:52px}
 .top .back{display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 var(--s2) 0 0;background:none;border:0;color:var(--tint);font-size:var(--sm);font-weight:400}
 .top .sp{flex:1}
 .mast{padding:var(--s2) var(--s4) var(--s4)}
 .mast h1{font-size:var(--xl)}
 .mast .sub{margin-top:6px;font-size:var(--sm);color:var(--tint)}
-main{flex:1;padding:0 var(--s4) var(--s5);display:flex;flex-direction:column;gap:var(--s5)}
+main{flex:1;padding:0 var(--pad-r) var(--s5) var(--pad-l);display:flex;flex-direction:column;gap:var(--s5)}
 /* progress */
 /* dock + buttons */
-.dock{position:sticky;bottom:0;z-index:10;padding:var(--s3) var(--s4) max(var(--s4),env(safe-area-inset-bottom));display:grid;gap:var(--s2);background:linear-gradient(to bottom,transparent,var(--bg) 28%)}
+.dock{position:sticky;bottom:0;z-index:10;padding:var(--s3) var(--pad-r) max(var(--s4),env(safe-area-inset-bottom)) var(--pad-l);display:grid;gap:var(--s2);background:linear-gradient(to bottom,transparent,var(--bg) 28%)}
 .btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:52px;width:100%;border:0;border-radius:var(--r-btn);font-size:var(--md);font-weight:600;cursor:pointer}
 .btn.pri{background:var(--acc);color:var(--on);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 2px 0 var(--acc-edge)}
 .btn.pri[disabled]{background:color-mix(in srgb,var(--ink) 14%,transparent);color:var(--tint);box-shadow:none}
@@ -71,7 +76,7 @@ main{flex:1;padding:0 var(--s4) var(--s5);display:flex;flex-direction:column;gap
 .callout{display:flex;align-items:center;gap:var(--s2);padding:8px 12px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:var(--xs);font-weight:400;color:var(--tint);align-self:flex-start}
 /* sheet */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:var(--r-sheet) var(--r-sheet) 0 0;background:var(--sheet);padding:var(--s3) var(--s4) max(var(--s4),env(safe-area-inset-bottom));box-shadow:0 -10px 24px -8px rgba(0,0,0,.6);display:grid;gap:var(--s4);max-height:88svh;overflow:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:var(--r-sheet) var(--r-sheet) 0 0;background:var(--sheet);padding:var(--s3) var(--pad-r) max(var(--s4),env(safe-area-inset-bottom)) var(--pad-l);box-shadow:0 -10px 24px -8px rgba(0,0,0,.6);display:grid;gap:var(--s4);max-height:88svh;overflow:auto}
 .sheet::before{content:"";justify-self:center;width:36px;height:4px;border-radius:2px;background:var(--hair2)}
 /* pips */
 .pips{display:inline-flex;gap:3px;vertical-align:middle}.pips i{width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--ink) 22%,transparent)}.pips i.on{background:currentColor}
@@ -108,7 +113,7 @@ main{flex:1;padding:0 var(--s4) var(--s5);display:flex;flex-direction:column;gap
 
 
 /* ---- Brass Wallet screens (from the 6-brass mockups) ---- */
-.bar{padding:var(--s3) var(--s4) var(--s3);display:flex;align-items:center;gap:var(--s3)}
+.bar{padding:var(--s3) var(--pad-r) var(--s3) var(--pad-l);display:flex;align-items:center;gap:var(--s3)}
 .bar h1{font-size:var(--lg)} .bar p{font-size:var(--xs);color:var(--tint);font-weight:400}
 .bar .link.q{color:var(--tint);text-decoration:none}
 .seat{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px 0 6px;border-radius:999px;font-weight:400;font-size:var(--sm);background:color-mix(in srgb,var(--ink) 8%,transparent);border:0;white-space:nowrap}
@@ -136,7 +141,7 @@ main{flex:1;padding:0 var(--s4) var(--s5);display:flex;flex-direction:column;gap
 .field input{flex:1;min-width:0;min-height:44px;border:0;background:none;font-size:1rem;color:var(--ink);letter-spacing:.08em;text-transform:uppercase}
 .field input::placeholder{color:var(--tint);letter-spacing:0;text-transform:none}
 .field.err{box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 0 0 2px oklch(70% 0.14 40)}
-.banner{position:fixed;top:0;left:0;right:0;z-index:60;padding:8px var(--s4);text-align:center;font-size:var(--sm);background:oklch(36% 0.06 60);color:var(--ink)}
+.banner{position:fixed;top:0;left:0;right:0;z-index:60;padding:8px calc(var(--s4) + var(--safe-r)) 8px calc(var(--s4) + var(--safe-l));text-align:center;font-size:var(--sm);background:oklch(36% 0.06 60);color:var(--ink)}
 .flash{position:fixed;left:var(--s4);right:var(--s4);bottom:96px;z-index:70;padding:12px var(--s4);border-radius:var(--r-sm);background:oklch(32% 0.05 40);color:var(--ink);font-size:var(--sm);box-shadow:0 8px 20px -8px #000}
 .qrbox{background:#fff;padding:var(--s3);border-radius:var(--r-sm);width:min(240px,70vw);justify-self:center}.qrbox svg{display:block;width:100%;height:auto}
 .rows .more{background:none;border:0;min-width:44px;min-height:44px;display:grid;place-items:center;color:var(--tint)}
@@ -151,7 +156,7 @@ main{flex:1;padding:0 var(--s4) var(--s5);display:flex;flex-direction:column;gap
 @media (prefers-reduced-motion:no-preference){.anim .sheet{animation:up 240ms var(--ease)}.anim .scrim{animation:fade 200ms linear}}
 @keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@media (min-width:700px){.screen{max-width:520px;margin:0 auto}.sheet{max-width:520px;margin:0 auto}}
+@media (min-width:700px){:root{--centre-gap:max(0px,calc((100vw - 520px) / 2))}.screen{max-width:520px;margin:0 auto}.sheet{max-width:520px;margin:0 auto}}
 .ledger .link{color:oklch(38% 0.09 60)}
 .lg-row .link{min-height:44px}
 p{text-wrap:pretty}
