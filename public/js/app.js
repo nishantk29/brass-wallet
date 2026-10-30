@@ -145,6 +145,7 @@ function startScreen() {
  <section style="display:grid;gap:var(--s2)"><p class="grp">Join a table</p><form class="field${A.err && A.page === 'start' ? ' err' : ''}" data-form="join"><input id="code" name="code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" placeholder="Room code" aria-label="Room code" value="${esc(A.draft.code || '')}" data-in="code"><button class="add" type="submit"${A.busy ? ' disabled' : ''}>Join</button></form>
  ${A.err ? `<p class="why" role="alert" style="text-align:left;color:oklch(80% 0.1 50)">${esc(A.err)}</p>` : ''}</section>
  <p class="sm tint">No internet? <button class="link" data-act="local">Play on this phone only</button>${saved ? ` <button class="link" data-act="resume">Resume the saved table</button>` : ''}</p>
+ <details class="kp-foot"><summary class="sm tint">Display</summary><kit-display-prefs></kit-display-prefs></details>
 </main>${dock(`<button class="btn pri" data-act="create"${A.busy ? ' disabled' : ''}>Start a table</button>`)}`;
 }
 
