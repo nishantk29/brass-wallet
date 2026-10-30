@@ -2,7 +2,7 @@
 // or a room where each seat is on this phone or on its own phone. The reducer in table.js runs here (local) or in the Room.
 import './icons.js';
 import * as R from './rules.js';
-import { newTable, reduce, viewFor, scoreTotal } from './table.js';
+import { newTable, reduce, viewFor, scoreTotal, midStamper } from './table.js';
 import { qrSvg, joinUrl } from './qr.js';
 import { wakeReconnect } from './wake.js';
 
@@ -35,7 +35,11 @@ function flash(msg) { A.flash = msg; render(); clearTimeout(flash.t); flash.t = 
 // ---- transport ---------------------------------------------------------------------------------------------------------
 function saveLocal() { store.set(K.local, JSON.stringify(T)); }
 function localView() { A.view = viewFor(T, { host: true }); }
+// Each change carries a message id, so the table applies it once (see midStamper in table.js).
+const newMid = () => Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(36).padStart(2, '0')).join('');
+const stampMid = midStamper({ newMid });
 function send(msg) {
+  msg = stampMid(msg);
   if (A.mode === 'local') {
     const r = reduce(T, { host: true }, msg, Math.random, Date.now());
     if (r.error) { flash(r.error); return r; }
@@ -395,7 +399,7 @@ function doJoin(seat) {
   if (!seat && !name) { A.err = 'Type your name first.'; return render(); }
   if (!ws || ws.readyState !== 1) { A.err = 'Not connected yet. Try again in a second.'; return render(); }
   if (name) store.set(K.name, name);
-  ws.send(JSON.stringify({ type: 'hello', join: name || 'Player', seat }));
+  ws.send(JSON.stringify(stampMid({ type: 'hello', join: name || 'Player', seat })));
 }
 document.addEventListener('submit', (e) => {
   const f = e.target.closest('[data-form]'); if (!f) return;

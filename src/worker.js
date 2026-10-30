@@ -98,6 +98,7 @@ export class Room extends DurableObject {
 
     if (msg.type === 'hello') {
       const h = hello(this.room, msg, cryptoRng, Date.now());
+      if (h.dup) return;
       if (h.lobby) { this.send(ws, h.lobby); return; }
       if (h.error) { this.send(ws, h.fatal ? { type: 'fatal', error: h.error, clear: true } : { type: 'error', error: h.error }); if (h.fatal) ws.close(1008, 'bad hello'); return; }
       if (h.reply) await this.save();
@@ -110,7 +111,7 @@ export class Room extends DurableObject {
     if (!actor) return;
     const res = reduce(this.room, actor, msg, cryptoRng, Date.now());
     if (res.error) { this.send(ws, { type: 'error', error: res.error }); return; }
-    await this.save();
+    if (!res.data?.dup) await this.save();
     this.broadcast();
   }
 
