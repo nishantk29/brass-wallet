@@ -92,14 +92,24 @@
   /* material: Liquid Glass on FLOATING CHROME ONLY (Nishant 2026-10-30 8:52 AM: "Transit cards with glass only on the
      floating bars"): the primary dock CTA, the bottom tab bar, the top bar or a sheet header. 1 to 3 bars per screen,
      at most 2 live blur layers, regular tinted variant, never glass on glass, never on content, never animated.
-     Tint >= 85% so text on glass stays >= 4.5:1 over the brightest backdrop (Scout style-assess section 3/4). */
-  --f-glass-tint:rgb(20 20 24 / .86);
+     Tint 75% (Nishant 2026-10-30 6:59 PM, Brave Privacy Hub look: between the 64% mockup and the old 86%), with a strong
+     frost (36px + saturate 1.8, static). Text on glass is checked for AA against the real content scrolling under it. */
+  --f-glass-tint:rgb(20 20 24 / .75);
   --f-glass-accent-src:var(--f-accent);                                    /* a site whose primary is not --f-accent sets only this */
   --f-glass-accent:var(--f-glass-accent-src); /* the primary stays opaque: a translucent gold (90-94%) read as disabled over the dark ground (shots 9:40 AM), so it floats with edge + shadow and no blur of its own */
-  --f-glass-blur:blur(16px) saturate(1.7);                                 /* <= 20px, static */
+  --f-glass-blur:blur(36px) saturate(1.8);                                 /* Brave-style frost, static, never animated */
   --f-glass-edge:inset 0 1px 0 rgb(255 255 255 / .22),inset 0 -1px 0 rgb(255 255 255 / .06);
   --f-glass-shadow:0 1px 2px rgb(0 0 0 / .24),0 8px 24px rgb(0 0 0 / .32);
-  --f-glass-sel:rgb(255 255 255 / .12);                                    /* selected tab capsule */
+  --f-glass-sel:rgb(255 255 255 / .12);                                    /* selected capsule on a glass bar */
+  /* bottom tab bar: a SOLID dark navy toolbar like Brave's (Nishant 2026-10-30 6:59 PM), no blur, purple icons; the same
+     navy in light mode (a fixed toolbar, as Brave does it). Labels 10.8:1, selected label 13.7:1 on the navy. */
+  --f-tabbar-bg:#12152B;
+  --f-tabbar-line:rgb(255 255 255 / .08);
+  --f-tabbar-ink:#C9C3F2;                                                   /* tab labels */
+  --f-tabbar-icon:#A99BFF;                                                  /* tab icons (non-text, >= 3:1) */
+  --f-tabbar-ink-on:#FFFFFF;                                                /* selected tab label */
+  --f-tabbar-icon-on:#C4B8FF;                                               /* selected tab icon */
+  --f-tabbar-sel:rgb(169 155 255 / .16);                                    /* selected tab: a faint purple highlight */
   --f-glass-solid:color-mix(in srgb,var(--f-ink) 10%,var(--f-bg));        /* every fallback */
   --f-scrim:rgb(0 0 0 / .48);
 
