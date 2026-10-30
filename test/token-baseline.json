@@ -1,21 +1,20 @@
 {
  "note": "Token gate ratchet. Lower only: node scripts/token-baseline.mjs --write. Never add by hand.",
  "counts": {
-  "fontSize": 8,
-  "lineHeight": 8,
+  "fontSize": 7,
+  "lineHeight": 7,
   "spacing": 28,
   "radius": 23,
   "iconSize": 0,
   "colour": 44
  },
  "distinct": {
-  "lineHeight": 6
+  "lineHeight": 7
  },
  "entries": {
   "fontSize": {
    "js/app.js|[inline style]|font-size|3.4rem": 1,
    "styles.css|.coin small|font-size|10px": 1,
-   "styles.css|.bal|font-size|4.2rem": 1,
    "styles.css|.stp button|font-size|20px": 1,
    "styles.css|.sc input,.fld|font-size|1rem": 1,
    "styles.css|.well|font-size|1rem": 1,
@@ -28,7 +27,6 @@
    "styles.css|.xs|line-height|1.35": 1,
    "styles.css|.lg|line-height|1.25": 1,
    "styles.css|.coin span|line-height|1": 1,
-   "styles.css|.bal|line-height|.95": 1,
    "styles.css|.lg-row|line-height|20px": 1,
    "styles.css|.win|line-height|1.08": 1
   },
