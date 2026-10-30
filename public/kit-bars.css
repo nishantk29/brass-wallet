@@ -1,0 +1,11 @@
+/* Floating Liquid Glass dock (Nishant 2026-10-30: glass only on floating chrome). Brass has no tab bar, so the one floating
+   bar is the bottom dock: a glass tray inset by the page margin, floating above the home indicator. "Start a table" and
+   the other primaries keep their copper fill (no blur of their own). Budget: 1 live blur layer. The family tokens make it
+   solid under data-noblur, no backdrop-filter support, reduced transparency or more contrast; an open sheet makes it solid
+   too. Loaded LAST. */
+.dock{bottom:var(--f-safe-b);margin:0 var(--pad-r) var(--f-safe-b) var(--pad-l);padding:var(--f-s3) 0;border-radius:var(--f-r-sheet);
+  background:var(--f-glass-tint);-webkit-backdrop-filter:var(--f-glass-blur);backdrop-filter:var(--f-glass-blur);
+  box-shadow:var(--f-glass-edge),var(--f-glass-shadow);isolation:isolate}
+.dock>*{margin-inline:var(--f-s3)}   /* inner side spacing on the children; the tray's own margins carry the landscape safe area (--pad-l/-r) */
+@media (min-width:700px){.dock{width:min(520px,calc(100% - 2 * var(--f-s4)));margin-inline:auto}}
+html:has(.scrim,.sheet) .dock{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--f-glass-solid)}

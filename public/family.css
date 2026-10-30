@@ -89,6 +89,30 @@
   --f-chrome-b-dock:calc(var(--f-safe-b) + var(--f-dock-h));
   --f-chrome-b-both:calc(var(--f-safe-b) + var(--f-tabbar-h) + var(--f-dock-h));
 
+  /* material: Liquid Glass on FLOATING CHROME ONLY (Nishant 2026-10-30 8:52 AM: "Transit cards with glass only on the
+     floating bars"): the primary dock CTA, the bottom tab bar, the top bar or a sheet header. 1 to 3 bars per screen,
+     at most 2 live blur layers, regular tinted variant, never glass on glass, never on content, never animated.
+     Tint 75% (Nishant 2026-10-30 6:59 PM, Brave Privacy Hub look: between the 64% mockup and the old 86%), with a strong
+     frost (36px + saturate 1.8, static). Text on glass is checked for AA against the real content scrolling under it. */
+  --f-glass-tint:rgb(20 20 24 / .75);
+  --f-glass-accent-src:var(--f-accent);                                    /* a site whose primary is not --f-accent sets only this */
+  --f-glass-accent:var(--f-glass-accent-src); /* the primary stays opaque: a translucent gold (90-94%) read as disabled over the dark ground (shots 9:40 AM), so it floats with edge + shadow and no blur of its own */
+  --f-glass-blur:blur(36px) saturate(1.8);                                 /* Brave-style frost, static, never animated */
+  --f-glass-edge:inset 0 1px 0 rgb(255 255 255 / .22),inset 0 -1px 0 rgb(255 255 255 / .06);
+  --f-glass-shadow:0 1px 2px rgb(0 0 0 / .24),0 8px 24px rgb(0 0 0 / .32);
+  --f-glass-sel:rgb(255 255 255 / .12);                                    /* selected capsule on a glass bar */
+  /* bottom tab bar: a SOLID dark navy toolbar like Brave's (Nishant 2026-10-30 6:59 PM), no blur, purple icons; the same
+     navy in light mode (a fixed toolbar, as Brave does it). Labels 10.8:1, selected label 13.7:1 on the navy. */
+  --f-tabbar-bg:#12152B;
+  --f-tabbar-line:rgb(255 255 255 / .08);
+  --f-tabbar-ink:#C9C3F2;                                                   /* tab labels */
+  --f-tabbar-icon:#A99BFF;                                                  /* tab icons (non-text, >= 3:1) */
+  --f-tabbar-ink-on:#FFFFFF;                                                /* selected tab label */
+  --f-tabbar-icon-on:#C4B8FF;                                               /* selected tab icon */
+  --f-tabbar-sel:rgb(169 155 255 / .16);                                    /* selected tab: a faint purple highlight */
+  --f-glass-solid:color-mix(in srgb,var(--f-ink) 10%,var(--f-bg));        /* every fallback */
+  --f-scrim:rgb(0 0 0 / .48);
+
   /* motion (Nishant, 2026-10-29): presses are snappy and nothing runs over 400ms.
      Durations are written as seen (no scale knob); reduced motion turns movement off.
      Press feedback lands in 100-150ms. */
@@ -133,3 +157,14 @@
   border-top:1px solid rgba(255,255,255,.1);background:var(--f-bg);color:var(--f-ink);font:400 var(--f-fs-sm)/1.4 var(--f-ui-font)}
 .f-footer a{display:inline-flex;align-items:center;min-height:var(--f-tap);color:inherit;text-underline-offset:3px}
 .f-footer ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:0 var(--f-s5)}
+
+/* ---- glass fallbacks: one token swap, so every bar that uses the tokens goes solid together ----
+   Safari has no prefers-reduced-transparency, so html[data-noblur="1"] (the in-app Reduce transparency switch, and the
+   low-end check: deviceMemory <= 2 or <= 2 cores) is the one that works on iPhone. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--f-glass-blur:none;--f-glass-tint:var(--f-glass-solid);--f-glass-accent:var(--f-glass-accent-src)}
+}
+@media (prefers-reduced-transparency:reduce){:root{--f-glass-blur:none;--f-glass-tint:var(--f-glass-solid);--f-glass-accent:var(--f-glass-accent-src)}}
+html[data-noblur="1"]{--f-glass-blur:none;--f-glass-tint:var(--f-glass-solid);--f-glass-accent:var(--f-glass-accent-src)}
+@media (prefers-contrast:more){:root{--f-glass-blur:none;--f-glass-tint:var(--f-bg);--f-glass-accent:var(--f-glass-accent-src);--f-glass-edge:inset 0 0 0 2px var(--f-ink)}}
+
