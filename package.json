@@ -9,7 +9,8 @@
     "dev": "wrangler dev",
     "test": "node scripts/test-gate.mjs",
     "e2e": "node test/e2e/multi-phone.e2e.mjs",
-    "build": "node scripts/build-embedded.mjs"
+    "build": "node scripts/build-embedded.mjs",
+    "test:spacing": "node test/kit/spacing-check.mjs"
   },
   "devDependencies": { "esbuild": "^0.27.3", "wrangler": "^4" }
 }
