@@ -160,3 +160,26 @@ main{flex:1;padding:0 var(--pad-r) var(--s5) var(--pad-l);display:flex;flex-dire
 .ledger .link{color:oklch(38% 0.09 60)}
 .lg-row .link{min-height:44px}
 p{text-wrap:pretty}
+
+/* home, desktop: one centred block in two uneven columns. The masthead, the £17 line and the one primary lead on the
+   left; joining a table and playing on this phone sit beside them. main dissolves so its children take grid areas and
+   the dock stops being a sticky bar; the DOM (and the phone layout) stays as it is. Scoped to the screen whose dock
+   holds "Start a table", so no other screen changes at any width. */
+@media (min-width:900px){
+  .screen:has(> .dock [data-act="create"]){
+    --centre-gap:max(0px,calc((100vw - 960px) / 2));
+    --inset-l:max(0px,calc(var(--safe-l) - var(--centre-gap))); --inset-r:max(0px,calc(var(--safe-r) - var(--centre-gap)));
+    --pad-l:calc(var(--s6) + var(--inset-l)); --pad-r:calc(var(--s6) + var(--inset-r));
+    max-width:960px;margin:0 auto;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+    grid-template-areas:"hero ." "coin join" "cta play";column-gap:var(--s7);row-gap:var(--s6);
+    align-content:center;align-items:center;padding:var(--s7) var(--pad-r) calc(var(--s7) * 2) var(--pad-l)}
+  .screen:has(> .dock [data-act="create"]) > main{display:contents}
+  .screen:has(> .dock [data-act="create"]) > main > div:first-child{grid-area:hero;align-self:end}
+  /* the masthead carries the wider block (the size is set inline for the phone, so it needs !important here) */
+  .screen:has(> .dock [data-act="create"]) > main > div:first-child > h1{font-size:calc(var(--x3) * 1.5)!important}
+  .screen:has(> .dock [data-act="create"]) > main > div:first-child > p{max-width:30rem;font-size:var(--lg)}
+  .screen:has(> .dock [data-act="create"]) > main > div:nth-child(2){grid-area:coin}
+  .screen:has(> .dock [data-act="create"]) > main > section{grid-area:join}
+  .screen:has(> .dock [data-act="create"]) > main > p{grid-area:play}
+  .screen:has(> .dock [data-act="create"]) > .dock{grid-area:cta;position:static;width:min(100%,22rem);padding:0;background:none}
+}
