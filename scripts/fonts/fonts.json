@@ -19,6 +19,11 @@
  ],
  "fonts": [
   {
+   "src": "scripts/fonts/src/rubik-var.woff2",
+   "out": "rubik",
+   "split": false
+  },
+  {
    "src": "scripts/fonts/src/bitter-700.woff2",
    "out": "bitter-700",
    "split": true

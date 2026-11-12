@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 test('files: fonts, licences, manifest and worker config exist', () => {
-  for (const f of ['public/fonts/bitter-700-core.woff2', 'public/fonts/bitter-700-ext.woff2', 'public/fonts/LICENSE-bitter.txt', 'public/fonts/rubik-var.woff2', 'public/manifest.webmanifest', 'public/sw.js', 'public/404.html']) assert.ok(fs.existsSync(f), f);
+  for (const f of ['public/fonts/bitter-700-core.woff2', 'public/fonts/bitter-700-ext.woff2', 'public/fonts/LICENSE-bitter.txt', 'public/fonts/rubik.woff2', 'public/manifest.webmanifest', 'public/sw.js', 'public/404.html']) assert.ok(fs.existsSync(f), f);
   const w = fs.readFileSync('wrangler.jsonc', 'utf8');
   assert.match(w, /"name": "brass-wallet"/); assert.match(w, /new_sqlite_classes": \["Room"\]/); assert.match(w, /"tag": "v1"/);
 });
