@@ -1,4 +1,4 @@
-// viewport-fit=cover: every page container pads left/right by the safe-area inset (Scout WEBKIT-27.md 1, SPACING.md 3).
+// viewport-fit=cover: every page container pads left/right by the safe-area inset (WebKit review item 1, SPACING.md 3).
 import test from 'node:test'; import assert from 'node:assert/strict';
 import { audit, rules, sides, isContainer } from './kit/safe-area-gate.mjs';
 const REQUIRED = ['.top', 'main', '.dock', '.sheet', '.bar', '.banner'];

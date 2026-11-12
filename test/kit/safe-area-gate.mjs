@@ -1,4 +1,4 @@
-// Safe-area gate (Scout WEBKIT-27.md 1 / SPACING.md 3): with viewport-fit=cover, every page container must pad its left
+// Safe-area gate (WebKit review item 1 / SPACING.md 3): with viewport-fit=cover, every page container must pad its left
 // and right edges by the safe-area inset. A "page container" is a rule that lays out a page edge: position fixed/sticky
 // spanning the width (left:0;right:0 or inset:0), a centred column (max-width + margin auto), or a selector the site lists.
 // Its horizontal padding passes when the left side references a left inset and the right side a right inset:

@@ -1,5 +1,5 @@
 // game-invariants.mjs: shared game-rules test kit for the Game Night family (node:test, no dependencies, Node 20+).
-// Source of truth: /workspace/code-team/shared/invariants/. Copy it UNCHANGED into a repo's test/kit/ and write a small
+// Source of truth: the shared invariants kit. Copy it UNCHANGED into a repo's test/kit/ and write a small
 // adapter for that game in test/game-invariants.test.js. See README.md in the same folder.
 //
 // Four properties, each a node:test test, checked over seeded random games:
