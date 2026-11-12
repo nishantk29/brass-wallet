@@ -1,8 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { lintCopy } from './kit/copy-lint.mjs';
-import { BANNED } from '/workspace/code-team/shared/copy-lint/banned-phrases.mjs';
+import { lintCopy, BANNED } from './kit/copy-lint.mjs';
 
 // Every user-facing file: string literals, template text and the HTML pages.
 const files = ['public/js/app.js', 'public/js/table.js', 'public/js/room.js', 'public/js/rules.js', 'src/worker.js', 'public/index.html', 'public/404.html'];

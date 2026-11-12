@@ -59,8 +59,8 @@ export function runGate({ cwd = process.cwd(), files = 'test/*.test.js', quiet =
 // ---- type check (opt-in per file) ----
 // JSDoc types checked by TypeScript without a build step: a file opts in with `// @ts-check` in its first 5 lines, and
 // `tsc --noEmit --allowJs` checks exactly those files (and what they import). Nothing changes at runtime.
-// tsc comes from $TSC, then <repo>/node_modules/.bin/tsc, then the box tool /workspace/forge/tools/ts. With no tsc the
-// check reports `skipped` and does not fail, so the deploy gate keeps working on a machine without TypeScript.
+// tsc comes from $TSC, then <repo>/node_modules/.bin/tsc (TypeScript is an optional dev tool). With no tsc the check
+// reports `skipped` and does not fail, so the deploy gate keeps working on a machine without TypeScript.
 const TS_DIRS = ['scripts', 'src', 'public/js', 'test/e2e'];
 /** @param {string} cwd @returns {string[]} */
 export function tsCheckFiles(cwd) {
@@ -79,7 +79,7 @@ export function tsCheckFiles(cwd) {
 }
 /** @param {string} cwd @returns {{ tsc: string, types: string } | null} */
 function findTsc(cwd) {
-  const cands = [process.env.TSC, path.join(cwd, 'node_modules/.bin/tsc'), '/workspace/forge/tools/ts/node_modules/.bin/tsc'].filter(Boolean);
+  const cands = [process.env.TSC, path.join(cwd, 'node_modules/.bin/tsc')].filter(Boolean);
   for (const c of /** @type {string[]} */ (cands)) if (fs.existsSync(c)) return { tsc: c, types: path.resolve(path.dirname(c), '..', '@types') };
   return null;
 }

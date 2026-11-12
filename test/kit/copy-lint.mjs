@@ -1,4 +1,4 @@
-// Shared copy lint (Nishant 2026-10-28: "Make sure the text is checked to avoid AI wording").
+// Shared copy lint (decided 2026-10-28: user-facing text is checked to avoid AI-sounding wording).
 // Import in each game's test gate and run over all user-facing strings (FAQ, roles, narration, buttons, tips).
 export const BANNED = [
   /\bdelv(e|es|ing)\b/i, /\bseamless(ly)?\b/i, /\belevat(e|es|ed|ing)\b/i, /\bembark/i, /\bunleash/i,
@@ -7,6 +7,7 @@ export const BANNED = [
   /\bnavigat(e|ing) the\b/i, /\bharness(es|ing)? the\b/i, /\bmeticulous/i, /\bcutting[- ]edge\b/i,
   /\bbuckle up\b/i, /\bthrilling\b/i, /\bep(ic|ically)\b/i, /\bultimate\b/i, /\brealm\b/i,
   /\bit['’]?s worth noting\b/i, /\bfurthermore\b/i, /\bmoreover\b/i, /\bdive (in|into)\b/i,
+  /\brevolution(ize|izes|ized|izing|ary)\b/i, /\bnext[- ]level\b/i, /\bsynerg(y|ies|istic)\b/i,
 ];
 // Heuristics: more than one em dash in a sentence; three comma-separated adjectives before a noun is reviewed by hand.
 export function lintCopy(text) {
