@@ -8,6 +8,8 @@ import { wakeReconnect } from './wake.js';
 
 const $app = document.getElementById('app');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Host's note under the wallet about seats on other phones: "Cal plays on their own phone." / "Cal, Dee and Eve play on their own phones."
+const remoteNote = (names) => `<p class="xs tint">${names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names.at(-1) : names[0]} ${names.length === 1 ? 'plays on their own phone. Tap their name' : 'play on their own phones. Tap their names'} to see or fix their wallet.</p>`;
 const store = {
   get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
@@ -233,7 +235,7 @@ function walletScreen(v) {
       ? `<p class="why" id="why">${esc(s.name)} ended their turn. ${waiting.length ? 'Waiting for ' + waiting.map((x) => esc(x.name)).join(', ') + '.' : ''} ${m.host ? '<button class="link" data-act="endRound">End the round now</button>' : ''}</p><button class="btn pri" disabled aria-describedby="why">Turn ended</button>`
       : `<button class="btn pri" data-act="endTurn" data-seat="${s.id}">${own ? 'End my turn' : `End ${esc(s.name)}’s turn`}</button>`;
   } else if (m.host && v.phase === 'turns') dockHtml = `<p class="why">${esc(s.name)} ends their own turn. <button class="link" data-act="endRound">End the round now</button></p>`;
-  return `${head}${chips}<main style="padding-top:var(--s5);gap:var(--s5)"><section>${rowLabel}<p class="bal" aria-label="Money ${money(s.money)}">${money(s.money)}</p>${stats}</section>${below}${hostLinks}${ledger}${m.host && v.seats.some((x) => x.where === 'remote') ? `<p class="xs tint">${v.seats.filter((x) => x.where === 'remote').map((x) => esc(x.name)).join(' and ')} play on their own phones. Tap their names to see or fix their wallet.</p>` : ''}</main>${dockHtml ? dock(dockHtml) : ''}`;
+  return `${head}${chips}<main style="padding-top:var(--s5);gap:var(--s5)"><section>${rowLabel}<p class="bal" aria-label="Money ${money(s.money)}">${money(s.money)}</p>${stats}</section>${below}${hostLinks}${ledger}${m.host && v.seats.some((x) => x.where === 'remote') ? remoteNote(v.seats.filter((x) => x.where === 'remote').map((x) => esc(x.name))) : ''}</main>${dockHtml ? dock(dockHtml) : ''}`;
 }
 
 function roundScreen(v) {
