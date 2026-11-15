@@ -10,5 +10,5 @@
     "e2e": "node test/e2e/multi-phone.e2e.mjs",
     "build": "node scripts/build-embedded.mjs"
   },
-  "devDependencies": { "esbuild": "^0.27.3", "wrangler": "^4" }
+  "devDependencies": { "esbuild": "^0.28.1", "wrangler": "^4" }
 }
