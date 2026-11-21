@@ -5,6 +5,7 @@ import * as R from './rules.js';
 import { newTable, reduce, viewFor, scoreTotal, midStamper } from './table.js';
 import { qrSvg, joinUrl } from './qr.js';
 import { wakeReconnect } from './wake.js';
+import { morePillHtml, morphFrom, morphBack } from './more-pill.js';
 
 const $app = document.getElementById('app');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -88,7 +89,7 @@ function openRoom(code) {
   connect();
 }
 function leaveRoom(error = '') {
-  wanted = false; closeSocket(); A.mode = null; A.view = null; A.page = 'start'; A.err = error; A.conn = false; A.sheet = null; store.del(K.last);
+  wanted = false; closeSocket(); A.mode = null; A.view = null; A.page = 'start'; A.err = error; A.conn = false; A.sheet = null; T = null; store.del(K.last);
   try { history.replaceState(null, '', '/'); } catch { /* sandboxed */ }
   render();
 }
@@ -137,6 +138,9 @@ async function joinCode(raw) {
 
 // ---- screens -----------------------------------------------------------------------------------------------------------
 const dock = (inner) => `<div class="dock">${inner}</div>`;
+// Table screens (setup, wallet, end of round, scoring, game over): the Menu pill sits at the top of the dock.
+const tableDock = (inner = '') => dock(morePillHtml({ label: 'Menu', act: 'more', open: A.sheet?.kind === 'more' }) + inner);
+const qrBox = (code) => `<div class="qrbox">${qrSvg(joinUrl(location.origin, code), 'QR code to join table ' + code)}</div>`;
 const barHtml = (title, sub, right = '') => `<header class="bar rivets"><div style="flex:1"><h1 class="disp">${esc(title)}</h1><p>${esc(sub)}</p></div>${right}</header>`;
 
 function startScreen() {
@@ -167,13 +171,13 @@ function setupScreen(v) {
   const m = me(); const n = v.seats.length;
   if (!m.host) {
     return `${barHtml('Table ' + v.code, 'Waiting for the host to start')}<main style="padding-top:var(--s5);gap:var(--s4)"><p class="sm tint">You’re in. The host starts the game when everyone has a seat.</p>
- <ul class="rows">${v.seats.map((s) => `<li>${tok(s, 's')}<span class="t"><b>${esc(s.name)}${s.id === m.seatId ? ' (you)' : ''}</b><span>${seatWhere(s)}</span></span></li>`).join('')}</ul></main>`;
+ <ul class="rows">${v.seats.map((s) => `<li>${tok(s, 's')}<span class="t"><b>${esc(s.name)}${s.id === m.seatId ? ' (you)' : ''}</b><span>${seatWhere(s)}</span></span></li>`).join('')}</ul></main>${tableDock()}`;
   }
   const open = v.seats.find((s) => s.open);
   let why = '', fix = '';
   if (n < R.MIN_PLAYERS) { why = 'Add a second player to start.'; fix = `<button class="link" data-act="addSeat">Add a seat on this phone</button>`; }
   else if (open) { why = `${open.name}’s seat is still open.`; fix = `<button class="link" data-act="menu" data-seat="${open.id}">Fix the seat</button>`; }
-  const qr = v.code && A.qr ? `<div class="qrbox">${qrSvg(joinUrl(location.origin, v.code), 'QR code to join table ' + v.code)}</div>` : '';
+  const qr = v.code && A.qr ? qrBox(v.code) : '';
   return `${barHtml('Your table', `${R.MIN_PLAYERS} to ${R.MAX_PLAYERS} players`)}
 <main style="padding-top:var(--s5);gap:var(--s4)">
  ${v.code ? `<p class="sm tint" style="display:flex;align-items:center;gap:8px">${icon('qr-f', 'sm')}Players join with code <b style="color:var(--ink);letter-spacing:.08em">${esc(v.code)}</b><button class="link" style="margin-left:auto" data-act="qr">${A.qr ? 'Hide QR' : 'Show QR'}</button></p>${qr}`
@@ -181,7 +185,7 @@ function setupScreen(v) {
  <ul class="rows">${v.seats.map((s) => `<li>${tok(s, 's')}<span class="t"><b>${esc(s.name)}</b><span>${seatWhere(s)}</span></span><button class="more" data-act="menu" data-seat="${s.id}" aria-label="Seat options for ${esc(s.name)}">${icon('more')}</button></li>`).join('')}</ul>
  ${n < R.MAX_PLAYERS ? `<p><button class="link" data-act="addSeat">${icon('users', 'sm')}Add a seat on this phone</button></p>` : ''}
  <p class="xs tint">Pick the colour of your player mat. The first turn order is random.</p>
-</main>${dock(`${why ? `<p class="why" id="why">${esc(why)} ${fix}</p>` : ''}<button class="btn pri" data-act="start"${why ? ' disabled aria-describedby="why"' : ''}>Start the canal era</button>`)}`;
+</main>${tableDock(`${why ? `<p class="why" id="why">${esc(why)} ${fix}</p>` : ''}<button class="btn pri" data-act="start"${why ? ' disabled aria-describedby="why"' : ''}>Start the canal era</button>`)}`;
 }
 function seatWhere(s) {
   if (s.open) return 'Open seat, waiting for a phone';
@@ -217,7 +221,7 @@ function walletScreen(v) {
   const own = m.seatId === s.id;
   const title = `${eraName(v)}, round ${v.round} of ${v.rounds}`;
   const sub = m.host ? (v.code ? `Room ${v.code}` : 'On this phone only') : `${s.name}, ${R.colourOf(s.colour).label.toLowerCase()}. You go ${ordinal(pos)}.`;
-  const head = barHtml(title, sub, m.host ? `<button class="link q" data-act="page" data-page="log">${icon('book', 'sm')}Log</button>` : actsHtml(v, s, ctl));
+  const head = barHtml(title, sub, m.host ? '' : actsHtml(v, s, ctl)); // host: the table log is in the Menu
   const chips = m.host ? `<nav class="seats" aria-label="Wallets">${v.seats.map((x) => `<button class="seat${x.id === s.id ? ' on' : ''}${x.where === 'remote' ? ' rem' : ''}" style="--c:${colourCss(x)}" data-act="pick" data-seat="${x.id}"${x.id === s.id ? ' aria-current="true"' : ''}><i></i>${esc(x.name)}</button>`).join('')}</nav>` : '';
   const where = s.where === 'local' ? (m.host ? ', on this phone' : '') : ', on their phone';
   const label = own ? `${esc(s.name)}’s money` : `${esc(s.name)}’s money${where}`;
@@ -235,7 +239,7 @@ function walletScreen(v) {
       ? `<p class="why" id="why">${esc(s.name)} ended their turn. ${waiting.length ? 'Waiting for ' + waiting.map((x) => esc(x.name)).join(', ') + '.' : ''} ${m.host ? '<button class="link" data-act="endRound">End the round now</button>' : ''}</p><button class="btn pri" disabled aria-describedby="why">Turn ended</button>`
       : `<button class="btn pri" data-act="endTurn" data-seat="${s.id}">${own ? 'End my turn' : `End ${esc(s.name)}’s turn`}</button>`;
   } else if (m.host && v.phase === 'turns') dockHtml = `<p class="why">${esc(s.name)} ends their own turn. <button class="link" data-act="endRound">End the round now</button></p>`;
-  return `${head}${chips}<main style="padding-top:var(--s5);gap:var(--s5)"><section>${rowLabel}<p class="bal" aria-label="Money ${money(s.money)}">${money(s.money)}</p>${stats}</section>${below}${hostLinks}${ledger}${m.host && v.seats.some((x) => x.where === 'remote') ? remoteNote(v.seats.filter((x) => x.where === 'remote').map((x) => esc(x.name))) : ''}</main>${dockHtml ? dock(dockHtml) : ''}`;
+  return `${head}${chips}<main style="padding-top:var(--s5);gap:var(--s5)"><section>${rowLabel}<p class="bal" aria-label="Money ${money(s.money)}">${money(s.money)}</p>${stats}</section>${below}${hostLinks}${ledger}${m.host && v.seats.some((x) => x.where === 'remote') ? remoteNote(v.seats.filter((x) => x.where === 'remote').map((x) => esc(x.name))) : ''}</main>${tableDock(dockHtml)}`;
 }
 
 function roundScreen(v) {
@@ -251,7 +255,7 @@ function roundScreen(v) {
  <ol class="rows">${order.map((s, i) => `<li><span class="disp num" style="font-size:var(--xl);width:28px">${i + 1}</span>${tok(s)}<span class="t"><b>${esc(s.name)}</b></span><span class="tint sm">${note(s, i)}</span></li>`).join('')}</ol></section>
  <section class="ledger" style="padding:var(--s2) 0"><p class="lg-row" style="font-weight:600">Income</p>${v.seats.map((s) => `<p class="lg-row" style="justify-content:space-between"><span>${esc(s.name)}</span><b style="font-variant-numeric:tabular-nums">${cell(s)}</b></p>`).join('')}
  <p class="lg-row" style="font-size:var(--xs);color:oklch(40% 0.02 75)">${lastGame ? 'This was the last round, so no income is paid. ' : ''}Can’t pay? Sell an industry tile for half its cost, rounded down. Still short: lose 1 VP per £1.</p></section>
-</main>${dock(m.host ? `<button class="btn pri" data-act="collect">${cta}</button>` : `<p class="why" id="why">The host closes the round.</p><button class="btn pri" disabled aria-describedby="why">${cta}</button>`)}`;
+</main>${tableDock(m.host ? `<button class="btn pri" data-act="collect">${cta}</button>` : `<p class="why" id="why">The host closes the round.</p><button class="btn pri" disabled aria-describedby="why">${cta}</button>`)}`;
 }
 
 function scoringScreen(v) {
@@ -265,7 +269,7 @@ function scoringScreen(v) {
  <div class="ledger" style="padding:var(--s2) var(--s3)"><table class="sc"><tr><th>Player</th><th>Links</th><th>Tiles</th><th>Total VP</th></tr>${rows}</table></div>
  ${canal ? `<section><h2 class="disp" style="font-size:var(--lg)">Before the rail era</h2><ol style="margin-top:var(--s2);display:grid;gap:6px" class="sm tint"><li>1. Score each link, then flipped tiles.</li><li>2. Take level 1 tiles off the board.</li><li>3. Refill merchant beer, reshuffle, draw 8 each.</li></ol></section>`
    : `<p class="sm tint">After this, the game is over. Most VP wins. Ties go to the highest income, then the most money.</p>`}
-</main>${dock(m.host ? `${why ? `<p class="why" id="why">${why} <button class="link" data-act="fillZero">Count blanks as 0</button></p>` : ''}<button class="btn pri" data-act="continue"${why ? ' disabled aria-describedby="why"' : ''}>${canal ? 'Start the rail era' : 'Finish the game'}</button>`
+</main>${tableDock(m.host ? `${why ? `<p class="why" id="why">${why} <button class="link" data-act="fillZero">Count blanks as 0</button></p>` : ''}<button class="btn pri" data-act="continue"${why ? ' disabled aria-describedby="why"' : ''}>${canal ? 'Start the rail era' : 'Finish the game'}</button>`
   : `<p class="why" id="why">The host types the totals.</p><button class="btn pri" disabled aria-describedby="why">${canal ? 'Start the rail era' : 'Finish the game'}</button>`)}`;
 }
 
@@ -276,7 +280,7 @@ function overScreen(v) {
 <main style="padding-top:var(--s5);gap:var(--s5)"><div><p class="sm tint">${tie ? 'Tie on VP, so income decides' : 'Winner'}</p><h2 class="disp win">${esc(win.name)} wins</h2></div>
  <ol class="rows">${ranked.map((s, i) => `<li><span class="disp num" style="font-size:var(--xl);width:28px">${i + 1}</span>${tok(s)}<span class="t"><b>${esc(s.name)}</b><span>Income ${money(s.level)}, money ${money(s.money)}</span></span><span class="n">${s.vp} VP</span></li>`).join('')}</ol>
  <section class="ledger" style="padding:var(--s2) 0"><p class="lg-row" style="font-weight:600">Table log</p>${logRows(v, null, 6)}</section>
-</main>${dock(me().host ? `<button class="btn pri" data-act="again">Play again with the same seats</button>` : `<p class="why">The host can start a new game.</p>`)}`;
+</main>${tableDock(me().host ? `<button class="btn pri" data-act="again">Play again with the same seats</button>` : `<p class="why">The host can start a new game.</p>`)}`;
 }
 
 function logScreen(v) {
@@ -292,7 +296,7 @@ function sheetHtml(v) {
   const sh = A.sheet; if (!sh) return '';
   const s = sh.seat ? seatOf(sh.seat) : null;
   const fresh = !sh.shown; sh.shown = true;
-  const wrap = (label, body) => `<div class="${fresh ? 'anim' : ''}"><div class="scrim" data-act="closeSheet"></div><dialog open class="sheet" style="border:0;color:var(--ink);width:auto;margin:0" aria-label="${esc(label)}">${body}</dialog></div>`;
+  const wrap = (label, body, cls = '') => `<div class="${[fresh ? 'anim' : '', cls].join(' ').trim()}"><div class="scrim" data-act="closeSheet"></div><dialog open class="sheet" style="border:0;color:var(--ink);width:auto;margin:0" aria-label="${esc(label)}">${body}</dialog></div>`;
   if (sh.kind === 'other') return wrap('Other cost', `<h2 class="disp" style="font-size:var(--xl)">${esc(s.name)} spends</h2><p class="sm tint">Type the cost in £. It goes back to the bank.</p>
    <form data-form="other" style="display:grid;gap:var(--s3)"><input id="amt" class="well big-in" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Cost in pounds" placeholder="£0" value="${esc(sh.amount ?? '')}" data-in="amount"><button class="btn pri" type="submit">Spend</button></form>`);
   if (sh.kind === 'income') {
@@ -309,6 +313,14 @@ function sheetHtml(v) {
    <div style="display:grid;gap:2px"><button class="btn pri" data-act="saveFix">Save fix</button>${s.canUndo ? `<button class="link" style="justify-self:center" data-act="undoHost" data-seat="${s.id}">Undo ${esc(s.name)}’s last change</button>` : ''}</div>`);
   if (sh.kind === 'take') return wrap('Move seat', `<h2 class="disp" style="font-size:var(--xl)">Move ${esc(s.name)} to this phone?</h2><p class="sm tint">Use this when ${esc(s.name)}’s phone dropped. Their wallet and log stay as they are. Their old phone is cut off from this seat.</p>
    <div style="display:grid;gap:var(--s2)"><button class="btn pri" data-act="takeConfirm" data-seat="${s.id}">Move ${esc(s.name)} here</button><button class="btn sec" data-act="closeSheet">Cancel</button></div>`);
+  if (sh.kind === 'more') {
+    // The Menu (from the pill): only actions Brass already has. Show QR / Hide QR is host, room mode, after setup.
+    const row = (act, ic, label, extra = '') => `<li><button class="rowmain" data-act="${act}"${extra}>${icon(ic)}<span class="t"><b>${label}</b></span></button></li>`;
+    const qrRow = me().host && A.mode === 'room' && v.code && v.phase !== 'setup';
+    return wrap('Menu', `<h2 class="disp" style="font-size:var(--xl)">Menu</h2>
+   <ul class="rows">${row('page', 'book', 'Table log', ' data-page="log"')}${qrRow ? row('qr', 'qr-f', A.qr ? 'Hide QR' : 'Show QR') : ''}${row('leave', 'left', 'Leave table')}</ul>
+   ${qrRow && A.qr ? `<p class="sm tint">Players join with code <b style="color:var(--ink);letter-spacing:.08em">${esc(v.code)}</b></p>${qrBox(v.code)}` : ''}`, 'menu-sh');
+  }
   if (sh.kind === 'menu') {
     const online = A.mode === 'room';
     return wrap('Seat options', `<div style="display:flex;gap:var(--s3);align-items:center">${tok(s, 's')}<h2 class="disp" style="font-size:var(--xl)">${esc(s.name)}</h2></div>
@@ -337,9 +349,17 @@ function render() {
   const active = document.activeElement;
   const keep = active && active.id && $app.contains(active) && active.tagName === 'INPUT' ? { id: active.id, val: active.value, s: active.selectionStart, e: active.selectionEnd } : null;
   const v = A.view;
+  // Menu morph: the sheet grows out of the pill only when it first appears and shrinks back only when it goes. A re-render
+  // while it is open (room update, Show QR) swaps the nodes with no motion and keeps focus on the same row.
+  const oldMenu = $app.querySelector('.menu-sh');
+  const menuFocus = oldMenu && oldMenu.contains(active) ? [...oldMenu.querySelectorAll('button')].indexOf(active) : -1;
   $app.innerHTML = `${A.mode === 'room' && !A.conn ? `<p class="banner" role="status" id="reconnecting">Reconnecting…</p>` : ''}<div class="screen grain">${body()}</div>${v ? sheetHtml(v) : ''}${A.flash ? `<p class="flash" role="status">${esc(A.flash)}</p>` : ''}`;
   if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.val; el.focus(); try { el.setSelectionRange(keep.s, keep.e); } catch { /* not text */ } } }
   else if (A.sheet?.focus) { const el = document.getElementById(A.sheet.focus); A.sheet.focus = null; el?.focus(); }
+  const menu = $app.querySelector('.menu-sh'), pill = $app.querySelector('.more-pill');
+  if (menu && !oldMenu) morphFrom(pill, menu.querySelector('.sheet'));
+  else if (menu && menuFocus >= 0) (menu.querySelectorAll('button')[menuFocus] || menu.querySelector('button'))?.focus({ preventScroll: true });
+  else if (!menu && oldMenu) morphBack(pill, oldMenu.querySelector('.sheet'), oldMenu.querySelector('.scrim'));
   document.title = v?.phase && v.phase !== 'setup' ? `Brass Wallet: ${v.era} round ${v.round}` : 'Brass Wallet';
 }
 
@@ -357,7 +377,8 @@ document.addEventListener('click', (e) => {
     case 'join': return doJoin();
     case 'claim': return doJoin(seat);
     case 'qr': A.qr = !A.qr; return render();
-    case 'page': A.page = d.page; return render();
+    case 'page': A.sheet = null; A.page = d.page; return render();
+    case 'more': A.sheet = { kind: 'more' }; return render();
     case 'pick': A.sel = seat; return render();
     case 'closeSheet': A.sheet = null; return render();
     case 'start': case 'collect': case 'again': case 'endRound': return send({ type: d.act });
