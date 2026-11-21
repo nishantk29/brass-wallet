@@ -183,3 +183,19 @@ p{text-wrap:pretty}
   .screen:has(> .dock [data-act="create"]) > main > p{grid-area:play}
   .screen:has(> .dock [data-act="create"]) > .dock{grid-area:cta;position:static;width:min(100%,22rem);padding:0;background:none}
 }
+
+/* more-pill: the Menu pill at the top of a table screen's dock; the Menu sheet grows out of it (js/more-pill.js).
+   Brass has none of the shared --f-* tokens, so they are mapped here. Opaque, no glass. */
+:root{--f-r-pill:999px;--f-press:120ms;--f-release:90ms;--f-press-scale:.97;--ease-pop:var(--ease)}
+.more-pill{justify-self:center;display:inline-flex;align-items:center;gap:var(--s2);min-width:44px;min-height:48px;padding:0 var(--s5) 0 var(--s4);border:0;border-radius:var(--f-r-pill);background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair2);font-size:var(--md);font-weight:600;cursor:pointer;
+  transition:transform var(--f-release) var(--ease-pop)}
+.more-pill svg{width:20px;height:20px;flex:none}
+.more-pill[aria-expanded="true"]{opacity:0}
+@media (prefers-reduced-motion:no-preference){.more-pill:active{transform:scale(var(--f-press-scale));transition-duration:var(--f-press)}}
+@media (prefers-reduced-motion:reduce){.more-pill{transition:none}}
+.more-ghost{pointer-events:none}
+.menu-sh .sheet{animation:none} /* the FLIP from the pill is the menu's only entrance; the scrim keeps its fade */
+.menu-sh .rowmain .i{width:22px;height:22px;color:var(--tint)}
+.menu-sh [data-act="leave"]{color:var(--tint)}
+.screen:has(.more-pill) ~ .flash{bottom:calc(148px + env(safe-area-inset-bottom))}
+.screen:has(.more-pill):has(.dock .why) ~ .flash{bottom:calc(212px + env(safe-area-inset-bottom))}

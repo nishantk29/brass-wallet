@@ -102,7 +102,7 @@ try {
   await host.shot(SHOTS, 'correction-390');
   await click(host, 'Save fix');
   L.check('Cal sees the fix in their own log', await visible(cal, 'Host fixed Cal’s money: £14 to £11. The build cost £3 more.'));
-  await click(host, 'Log');
+  await click(host, 'Menu'); await click(host, 'Table log'); // the host's Log link moved into the Menu
   L.check('table log lists the fix', await visible(host, 'Host fixed Cal’s money'));
   await host.shot(SHOTS, 'table-log-390');
   await click(host, 'Back');
