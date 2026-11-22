@@ -146,13 +146,17 @@ const barHtml = (title, sub, right = '') => `<header class="bar rivets"><div sty
 function startScreen() {
   const saved = store.get(K.local);
   return `<main style="padding-top:var(--s7);gap:var(--s6)">
- <div><h1 class="disp" style="font-size:3.4rem;line-height:.95">Brass<br>Wallet</h1><p class="tint" style="margin-top:var(--s3)">Money, loans, income and turn order for your Brass: Birmingham table. The board stays on the table.</p></div>
+ <div><h1 class="disp" style="font-size:3.4rem;line-height:.95">Brass <br>Wallet</h1><p class="tint" style="margin-top:var(--s3)">Money, loans, income and turn order for your Brass: Birmingham table. The board stays on the table.</p></div>
  <div style="display:flex;gap:var(--s3)"><span class="coin" style="width:72px;height:72px"><span>£${R.START_MONEY}</span></span><p class="sm tint" style="flex:1;align-self:center">Each player starts with £${R.START_MONEY} and income £0.</p></div>
  <section style="display:grid;gap:var(--s2)"><p class="grp">Join a table</p><form class="field${A.err && A.page === 'start' ? ' err' : ''}" data-form="join"><input id="code" name="code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" placeholder="Room code" aria-label="Room code" value="${esc(A.draft.code || '')}" data-in="code"><button class="add" type="submit"${A.busy ? ' disabled' : ''}>Join</button></form>
  ${A.err ? `<p class="why" role="alert" style="text-align:left;color:oklch(80% 0.1 50)">${esc(A.err)}</p>` : ''}</section>
  <p class="sm tint">No internet? <button class="link" data-act="local">Play on this phone only</button>${saved ? ` <button class="link" data-act="resume">Resume the saved table</button>` : ''}</p>
-</main>${dock(`<button class="btn pri" data-act="create"${A.busy ? ' disabled' : ''}>Start a table</button>`)}`;
+</main>${dock(`<button class="btn pri" data-act="create"${A.busy ? ' disabled' : ''}>Start a table</button>`)}${gamesFooter()}`;
 }
+// The family of games, on the home screen only. Brass Wallet is this page, so it is named but not linked.
+const GAMES = [['Mafia Night', 'https://mafia.hatethespurs.com'], ['Quest Night', 'https://avalon.hatethespurs.com'], ['The Gilded Chamber', 'https://gilded.hatethespurs.com'], ['Brass Wallet', ''], ['The Odd Card', 'https://oddcard.hatethespurs.com']];
+const gamesFooter = () => `<footer class="games"><a class="link" href="https://gamenight.hatethespurs.com">All games</a>
+ <ul>${GAMES.map(([n, u]) => `<li>${u ? `<a class="link" href="${u}">${n}</a>` : `<span aria-current="page">${n}</span>`}</li>`).join('')}</ul></footer>`;
 
 function joinScreen() {
   const l = A.lobby || {};
@@ -296,7 +300,7 @@ function sheetHtml(v) {
   const sh = A.sheet; if (!sh) return '';
   const s = sh.seat ? seatOf(sh.seat) : null;
   const fresh = !sh.shown; sh.shown = true;
-  const wrap = (label, body, cls = '') => `<div class="${[fresh ? 'anim' : '', cls].join(' ').trim()}"><div class="scrim" data-act="closeSheet"></div><dialog open class="sheet" style="border:0;color:var(--ink);width:auto;margin:0" aria-label="${esc(label)}">${body}</dialog></div>`;
+  const wrap = (label, body, cls = '') => `<div class="${[fresh ? 'anim' : '', cls].join(' ').trim()}"><div class="scrim" data-act="closeSheet"></div><dialog open class="sheet" style="border:0;color:var(--ink);width:auto;margin:0" aria-modal="true" aria-label="${esc(label)}" tabindex="-1">${body}</dialog></div>`;
   if (sh.kind === 'other') return wrap('Other cost', `<h2 class="disp" style="font-size:var(--xl)">${esc(s.name)} spends</h2><p class="sm tint">Type the cost in £. It goes back to the bank.</p>
    <form data-form="other" style="display:grid;gap:var(--s3)"><input id="amt" class="well big-in" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Cost in pounds" placeholder="£0" value="${esc(sh.amount ?? '')}" data-in="amount"><button class="btn pri" type="submit">Spend</button></form>`);
   if (sh.kind === 'income') {
@@ -353,13 +357,16 @@ function render() {
   // while it is open (room update, Show QR) swaps the nodes with no motion and keeps focus on the same row.
   const oldMenu = $app.querySelector('.menu-sh');
   const menuFocus = oldMenu && oldMenu.contains(active) ? [...oldMenu.querySelectorAll('button')].indexOf(active) : -1;
-  $app.innerHTML = `${A.mode === 'room' && !A.conn ? `<p class="banner" role="status" id="reconnecting">Reconnecting…</p>` : ''}<div class="screen grain">${body()}</div>${v ? sheetHtml(v) : ''}${A.flash ? `<p class="flash" role="status">${esc(A.flash)}</p>` : ''}`;
+  $app.innerHTML = `${A.mode === 'room' && !A.conn ? `<p class="banner" role="status" id="reconnecting">Reconnecting…</p>` : ''}<div class="screen grain"${v && A.sheet ? ' inert' : ''}>${body()}</div>${v ? sheetHtml(v) : ''}${A.flash ? `<p class="flash" role="status">${esc(A.flash)}</p>` : ''}`;
   if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.val; el.focus(); try { el.setSelectionRange(keep.s, keep.e); } catch { /* not text */ } } }
   else if (A.sheet?.focus) { const el = document.getElementById(A.sheet.focus); A.sheet.focus = null; el?.focus(); }
   const menu = $app.querySelector('.menu-sh'), pill = $app.querySelector('.more-pill');
   if (menu && !oldMenu) morphFrom(pill, menu.querySelector('.sheet'));
   else if (menu && menuFocus >= 0) (menu.querySelectorAll('button')[menuFocus] || menu.querySelector('button'))?.focus({ preventScroll: true });
   else if (!menu && oldMenu) morphBack(pill, oldMenu.querySelector('.sheet'), oldMenu.querySelector('.scrim'));
+  // A sheet is modal: the screen behind it is inert, so focus that is not already in the sheet moves to the sheet itself.
+  const sheet = $app.querySelector('dialog.sheet');
+  if (sheet && !sheet.contains(document.activeElement)) sheet.focus({ preventScroll: true });
   document.title = v?.phase && v.phase !== 'setup' ? `Brass Wallet: ${v.era} round ${v.round}` : 'Brass Wallet';
 }
 

@@ -1,7 +1,7 @@
 /* Brass Wallet. Tokens and shapes ported from the approved mockup (proposals/_shared/v2.css, Brass block). */
 @font-face{font-family:"Rubik";src:url(/fonts/rubik-var.woff2) format("woff2");font-weight:300 900;font-display:swap}
 @font-face{font-family:"Bitter";src:url(/fonts/bitter-700-core.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+20-7E,U+A0,U+A3,U+B7,U+2013-2014,U+2018-2019,U+201C-201D,U+2022,U+2026,U+2212}@font-face{font-family:"Bitter";src:url(/fonts/bitter-700-ext.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0,U+D,U+A1-A2,U+A4-AC,U+AE-B6,U+B8-FF,U+102,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+300-301,U+303-304,U+308-309,U+323,U+2009,U+200B,U+201A,U+201E,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2215}
-/* Proposal mockups v2, redrawn against the design notes. Not shipped. */
+/* The shipped stylesheet: tokens, then components, then breakpoints. */
 :root{
   /* landscape safe areas (viewport-fit=cover), SPACING.md 3: every page edge pads by the part of the inset that the
      centred 520px column (from 700 wide) doesn't already clear */
@@ -71,12 +71,13 @@ main{flex:1;padding:0 var(--pad-r) var(--s5) var(--pad-l);display:flex;flex-dire
 /* inline field */
 .field{display:flex;align-items:center;gap:var(--s2);min-height:56px;padding:var(--s2) var(--s2) var(--s2) var(--s4);border-radius:var(--r-btn);background:var(--well);box-shadow:inset 0 2px 3px rgba(0,0,0,.35)}
 .field span{flex:1;color:var(--tint2)}
-.field .add{min-height:40px;padding:0 var(--s4);border:0;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ink) 12%,transparent);font-weight:600}
+.field .add{min-height:44px;padding:0 var(--s4);border:0;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ink) 12%,transparent);font-weight:600}
 /* compact callout (6.6) */
 .callout{display:flex;align-items:center;gap:var(--s2);padding:8px 12px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:var(--xs);font-weight:400;color:var(--tint);align-self:flex-start}
 /* sheet */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:var(--r-sheet) var(--r-sheet) 0 0;background:var(--sheet);padding:var(--s3) var(--pad-r) max(var(--s4),env(safe-area-inset-bottom)) var(--pad-l);box-shadow:0 -10px 24px -8px rgba(0,0,0,.6);display:grid;gap:var(--s4);max-height:88svh;overflow:auto}
+.sheet:focus{outline:none} /* the sheet takes focus as a whole when it opens; its controls keep the ring */
 .sheet::before{content:"";justify-self:center;width:36px;height:4px;border-radius:2px;background:var(--hair2)}
 /* pips */
 .pips{display:inline-flex;gap:3px;vertical-align:middle}.pips i{width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--ink) 22%,transparent)}.pips i.on{background:currentColor}
@@ -171,7 +172,7 @@ p{text-wrap:pretty}
     --inset-l:max(0px,calc(var(--safe-l) - var(--centre-gap))); --inset-r:max(0px,calc(var(--safe-r) - var(--centre-gap)));
     --pad-l:calc(var(--s6) + var(--inset-l)); --pad-r:calc(var(--s6) + var(--inset-r));
     max-width:960px;margin:0 auto;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
-    grid-template-areas:"hero ." "coin join" "cta play";column-gap:var(--s7);row-gap:var(--s6);
+    grid-template-areas:"hero ." "coin join" "cta play" "foot foot";column-gap:var(--s7);row-gap:var(--s6);
     align-content:center;align-items:center;padding:var(--s7) var(--pad-r) calc(var(--s7) * 2) var(--pad-l)}
   .screen:has(> .dock [data-act="create"]) > main{display:contents}
   .screen:has(> .dock [data-act="create"]) > main > div:first-child{grid-area:hero;align-self:end}
@@ -182,12 +183,13 @@ p{text-wrap:pretty}
   .screen:has(> .dock [data-act="create"]) > main > section{grid-area:join}
   .screen:has(> .dock [data-act="create"]) > main > p{grid-area:play}
   .screen:has(> .dock [data-act="create"]) > .dock{grid-area:cta;position:static;width:min(100%,22rem);padding:0;background:none}
+  .screen:has(> .dock [data-act="create"]) > .games{grid-area:foot;padding:var(--s4) 0 0}
 }
 
 /* more-pill: the Menu pill at the top of a table screen's dock; the Menu sheet grows out of it (js/more-pill.js).
    Brass has none of the shared --f-* tokens, so they are mapped here. Opaque, no glass. */
 :root{--f-r-pill:999px;--f-press:120ms;--f-release:90ms;--f-press-scale:.97;--ease-pop:var(--ease)}
-.more-pill{justify-self:center;display:inline-flex;align-items:center;gap:var(--s2);min-width:44px;min-height:48px;padding:0 var(--s5) 0 var(--s4);border:0;border-radius:var(--f-r-pill);background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair2);font-size:var(--md);font-weight:600;cursor:pointer;
+.more-pill{justify-self:center;display:inline-flex;align-items:center;gap:var(--s2);min-width:44px;min-height:48px;padding:0 var(--s5) 0 var(--s4);border:0;border-radius:var(--f-r-pill);background:var(--sheet);color:var(--ink);box-shadow:inset 0 0 0 1px var(--hair2);font-size:var(--md);font-weight:700;cursor:pointer;
   transition:transform var(--f-release) var(--ease-pop)}
 .more-pill svg{width:20px;height:20px;flex:none}
 .more-pill[aria-expanded="true"]{opacity:0}
@@ -199,3 +201,10 @@ p{text-wrap:pretty}
 .menu-sh [data-act="leave"]{color:var(--tint)}
 .screen:has(.more-pill) ~ .flash{bottom:calc(148px + env(safe-area-inset-bottom))}
 .screen:has(.more-pill):has(.dock .why) ~ .flash{bottom:calc(212px + env(safe-area-inset-bottom))}
+
+/* games footer (home only): "All games" and the family's five games. Every link keeps the 44px .link target. */
+.games{display:grid;gap:var(--s1);padding:var(--s4) var(--pad-r) max(var(--s5),env(safe-area-inset-bottom)) var(--pad-l);border-top:1px solid var(--hair);font-size:var(--sm);color:var(--tint)}
+.games ul{display:flex;flex-wrap:wrap;column-gap:var(--s4)}
+.games li{display:flex;align-items:center;min-height:44px}
+.games .link{color:var(--tint)}
+.games [aria-current]{color:var(--ink);font-weight:600}
