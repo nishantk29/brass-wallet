@@ -2,6 +2,7 @@
 // Cloudflare API without the assets-upload step. The normal path is still Workers Static Assets (see wrangler.jsonc).
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { build } from 'esbuild';
 
 const TYPES = { js: 'application/javascript; charset=utf-8', css: 'text/css; charset=utf-8', html: 'text/html; charset=utf-8', png: 'image/png',
@@ -9,19 +10,15 @@ const TYPES = { js: 'application/javascript; charset=utf-8', css: 'text/css; cha
 const files = {};
 const walk = (d) => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else files['/' + path.relative('public', p).split(path.sep).join('/')] = p; } };
 walk('public');
-const map = Object.fromEntries(Object.entries(files).map(([u, p]) => [u, { t: TYPES[path.extname(p).slice(1)] || 'application/octet-stream', b: fs.readFileSync(p).toString('base64') }]));
+// The ETag is the first 16 hex of the file's SHA-256, so it changes exactly when the content does.
+const etag = (buf) => `"${createHash('sha256').update(buf).digest('hex').slice(0, 16)}"`;
+const map = Object.fromEntries(Object.entries(files).map(([u, p]) => { const buf = fs.readFileSync(p); return [u, { t: TYPES[path.extname(p).slice(1)] || 'application/octet-stream', b: buf.toString('base64'), e: etag(buf) }]; }));
 fs.mkdirSync('dist-embedded', { recursive: true });
+// Headers, cache lifetimes and If-None-Match handling live in scripts/asset-server.mjs (unit-tested).
 fs.writeFileSync('dist-embedded/entry.js', `import worker, { Room } from '../src/worker.js';
+import { serve } from '../scripts/asset-server.mjs';
 const FILES = ${JSON.stringify(map)};
-const bytes = (b) => Uint8Array.from(atob(b), (c) => c.charCodeAt(0));
-const ASSETS = { async fetch(req) {
-  const url = new URL(req.url);
-  const p = url.pathname === '/' ? '/index.html' : url.pathname;
-  const f = FILES[p];
-  if (!f) { const nf = FILES['/404.html']; return new Response(nf ? bytes(nf.b) : 'Not found', { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } }); }
-  const cache = p === '/index.html' || p === '/sw.js' ? 'no-cache' : 'public, max-age=3600';
-  return new Response(bytes(f.b), { headers: { 'content-type': f.t, 'cache-control': cache } });
-} };
+const ASSETS = { async fetch(req) { return serve(FILES, req); } };
 export default { fetch: (req, env, ctx) => worker.fetch(req, Object.assign(Object.create(env), { ROOM: env.ROOM, ASSETS }), ctx) };
 export { Room };
 `);
