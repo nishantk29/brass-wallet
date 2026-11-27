@@ -1,0 +1,45 @@
+# Review gate + auto-merge. Required check: "review-gate".
+# Passes only when the PR is not a draft and carries the "reviewed" label (added after the
+# tests, screenshots and diff were checked). New commits remove the label, so a changed PR
+# needs a fresh review. With the label on, auto-merge is switched on; GitHub then merges
+# only after every required check ("ci", "review-gate") is green.
+name: review
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review, converted_to_draft]
+
+concurrency:
+  group: review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  review-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.html_url }}
+      REVIEWED: ${{ contains(github.event.pull_request.labels.*.name, 'reviewed') }}
+      DRAFT: ${{ github.event.pull_request.draft }}
+      ACTION: ${{ github.event.action }}
+    steps:
+      - name: New commits clear the review
+        if: env.ACTION == 'synchronize' && env.REVIEWED == 'true'
+        run: |
+          gh pr edit "$PR" --remove-label reviewed || true
+          gh pr merge "$PR" --disable-auto || true
+          echo "::error::New commits after review. Review again, then add the 'reviewed' label."
+          exit 1
+      - name: Require a review
+        if: env.REVIEWED != 'true' || env.DRAFT == 'true'
+        run: |
+          echo "::error::Not reviewed yet. Mark the PR ready and add the 'reviewed' label after checking it."
+          exit 1
+      - name: Turn on auto-merge (merges once required checks pass)
+        continue-on-error: true
+        run: gh pr merge "$PR" --auto --squash

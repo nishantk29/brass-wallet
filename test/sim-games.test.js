@@ -26,10 +26,12 @@ function play(n, seed, remote) {
   }
   return { t, rounds, eras };
 }
+const GAMES = Number(process.env.SIM_GAMES) || 40; // release fuzz raises these
+const BASE = Number(process.env.SIM_SEED) || 1000;
 for (const n of [2, 3, 4]) {
   test(`sim: ${n}-player games run canal and rail eras to the end (${R.roundsFor(n)} rounds each)`, () => {
-    for (let g = 0; g < 40; g++) {
-      const { t, rounds, eras } = play(n, 1000 + g * 31 + n, g % n);
+    for (let g = 0; g < GAMES; g++) {
+      const { t, rounds, eras } = play(n, BASE + g * 31 + n, g % n);
       assert.equal(rounds, 2 * R.roundsFor(n)); assert.equal(eras, 2);
       assert.equal(t.final.length, n); assert.deepEqual(t.final, ranking(t));
       assert.ok(t.log.length > 10);
