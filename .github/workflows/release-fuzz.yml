@@ -1,0 +1,33 @@
+# Release fuzzing: seeded stress tests, only when a release tag (v*) is pushed or by hand.
+# Never on pull requests or pushes to main. Hard budget: one job, 10 minutes, fixed iteration count.
+# The seed comes from the run id and is printed, so any failure can be replayed locally.
+name: release-fuzz
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: release-fuzz
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Fuzz (4,000 seeded games per table size)
+        run: |
+          export SIM_SEED=$(( GITHUB_RUN_ID % 4000000000 + 1 ))
+          echo "Replay locally with: SIM_SEED=$SIM_SEED SIM_GAMES=4000 npm run fuzz"
+          SIM_GAMES=4000 npm run fuzz
